@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Src">
+      <UniqueIdentifier>{dc837d1c-379d-4d94-bbad-09d00958aa48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Game">
+      <UniqueIdentifier>{ab9234fe-81e7-4958-b1e8-af898afe308b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Note.cpp">
+      <Filter>Src\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Src\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Define.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle.cpp">
+      <Filter>Src\Game</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Note.h">
+      <Filter>Src\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Define.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="Particle.h">
+      <Filter>Src\Game</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="Game.h">
+      <Filter>Src\Game</Filter>
+    </QtMoc>
+  </ItemGroup>
+</Project>

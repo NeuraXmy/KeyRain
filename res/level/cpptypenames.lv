@@ -1,0 +1,25 @@
+Cpp Typenames
+
+bool
+int
+short
+double
+float
+longdouble
+longlong
+long
+unsigned
+unsignedlonglong
+char
+string
+vector
+map
+queue
+priorityqueue
+const
+set
+auto
+stack
+deque
+list
+
