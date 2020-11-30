@@ -5,7 +5,7 @@
 #include <qfontmetrics.h>
 
 Note::Note(char ch, double x, double y, bool wordBegin)
-	: ch(ch), x(x), y(y), stat(NoteStat::hidden), wordBegin(wordBegin), color(), lastCastDragParticleTime()
+	: ch(ch), x(x), y(y), stat(NoteStat::hidden), wordBegin(wordBegin), color(), lastCastDragParticleTime(), bonus(BonusMode::noBonus)
 {
 
 }
@@ -29,13 +29,22 @@ void Note::Show(QPainter* painter, bool is1st, bool fever) const
 
 	if (!fever)
 	{
-		double yFactor = y / double(Def::trackHeight);
 		fstFactor = is1st ? 1.5 : 1.0;
-		r = std::min(255.0, ((1.0 - yFactor) * 200 + 55) * fstFactor);
-		g = std::min(255.0, (yFactor * 200 + 55) * fstFactor);
-		b = std::min(255.0, 40 * fstFactor);
-
-		color = QColor(r * 0.8, g * 0.8, b * 0.8);
+		if (bonus)
+		{
+			r = std::min(255.0, 100 * fstFactor);
+			g = std::min(255.0, 100 * fstFactor);
+			b = std::min(255.0, 255 * fstFactor);
+			color = QColor(r * 0.8, g * 0.8, b * 0.8);
+		}
+		else
+		{
+			double yFactor = y / double(Def::trackHeight);
+			r = std::min(255.0, ((1.0 - yFactor) * 200 + 55) * fstFactor);
+			g = std::min(255.0, (yFactor * 200 + 55) * fstFactor);
+			b = std::min(255.0, 40 * fstFactor);
+			color = QColor(r * 0.8, g * 0.8, b * 0.8);
+		}
 	}
 	else
 	{

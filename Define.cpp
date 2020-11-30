@@ -2,6 +2,7 @@
 #include "Particle.h"
 
 #include <random>
+#include <qcolor.h>
 
 namespace Def
 {
@@ -58,8 +59,8 @@ namespace Def
 
 	const int maxHealth = 1000;
 	const int comboHealth = 1;
-	const int noteLostHealth = -20;
-	const int noteMissHealth = -10;
+	const int noteLostHealth = -100;
+	const int noteMissHealth = -50;
 
 	const double maxFever = 1000;
 	const double feverIncreaseSpeed = 30;
@@ -85,8 +86,30 @@ namespace Def
 	const int feverParticleInterval = 300;
 	const Particle feverParticle = Particle(3000, 0.005, 5);
 
-	std::default_random_engine re;
+	const int bonusCombo = 20;
+	const int bonusTime[] =
+	{
+		0, 10000, 10000, 10000, 10000
+	};
+	const std::string bonusTitle[] =
+	{
+		"",
+		"SPEED UP",
+		"SLOW DOWN",
+		"REVERSE",
+		"RANDOM"
+	};
+	const QColor bonusColor[] =
+	{
+		QColor(0, 0, 0),
+		QColor(10, 50, 255),
+		QColor(255, 50, 10),
+		QColor(50, 255, 255),
+		QColor(255, 50, 200)
+	};
+	const int bonusScore = 100;
 
+	std::default_random_engine re;
 	int RandInt(int l, int r)
 	{
 		std::uniform_int_distribution<int> u(l, r);

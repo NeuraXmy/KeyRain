@@ -21,16 +21,6 @@ enum GameStat
 	ended
 };
 
-
-enum BonusMode
-{
-	common,
-	fast,
-	slow,
-	reverse,
-	random
-};
-
 enum FeverMode
 {
 	notFever,
@@ -76,6 +66,7 @@ private:
 	int time;
 
 	int combo;
+	int nextBonusCombo;
 
 	int score;
 	int scoreDisplaying;
@@ -95,6 +86,7 @@ private:
 	int noteCount;
 
 	int bonusMode;
+	int bonusStartTime = 0;
 
 	int health;
 

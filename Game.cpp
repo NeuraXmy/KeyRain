@@ -97,7 +97,9 @@ void Game::ResetAll()
 
 	stat = GameStat::preparing;
 
-	bonusMode = BonusMode::common;
+	bonusMode = BonusMode::noBonus;
+	bonusStartTime = -100000;
+	nextBonusCombo = Def::bonusCombo;
 
 	noteCount = 0;
 
@@ -165,6 +167,20 @@ void Game::Update()
 		noteSpeed = (1.0 - process) * Def::noteSpeedStart + process * Def::noteSpeedEnd;
 		noteSlowDown = (1.0 - process) * Def::noteSlowDownStart + process * Def::noteSlowDownEnd;
 		noteInterval = (1.0 - process) * Def::noteIntervalStart + process * Def::noteIntervalEnd - (feverMode == FeverMode::fever ? 0.05 : 0.0);
+		if (bonusMode == BonusMode::fast)
+		{
+			noteSpeed *= 1.5;
+			noteInterval *= 0.9;
+		}
+		else if (bonusMode == BonusMode::slow)
+		{
+			noteSpeed *= 0.5;
+			noteInterval *= 1.1;
+		}
+		else if (bonusMode != BonusMode::noBonus)
+		{
+			noteSpeed *= 0.8;
+		}
 
 		for (char ch = 'a'; ch <= 'z'; ch++)
 		{
@@ -180,9 +196,17 @@ void Game::Update()
 		else
 		{
 			double light = fever / Def::maxFever * std::max(0.0, (std::sin(time / 1000.0 * Def::pi * 2.0) + 1.0) * 0.25 + 0.5);
-			QColor color = Lerp(QColor(feverBarColor.red() * light, feverBarColor.green() * light, feverBarColor.blue() * light), 
-				Qt::white, feverMode == FeverMode::fever ? 0.5 : 0.0);
-			bottomLightColor = Lerp(bottomLightColor, color, 0.05);
+
+			if (bonusMode != BonusMode::noBonus)
+			{
+				bottomLightColor = Lerp(bottomLightColor, Def::bonusColor[bonusMode], 0.05);
+			}
+			else
+			{
+				QColor color = Lerp(QColor(feverBarColor.red() * light, feverBarColor.green() * light, feverBarColor.blue() * light),
+					Qt::white, feverMode == FeverMode::fever ? 0.5 : 0.0);
+				bottomLightColor = Lerp(bottomLightColor, color, 0.05);
+			}
 		}
 		bottomLightHeight += ((feverMode == FeverMode::fever ? 1.0 : 0.65) - bottomLightHeight) * 0.01;
 
@@ -204,8 +228,8 @@ void Game::Update()
 					note->stat = NoteStat::cleared;
 					noteCount += feverMode != FeverMode::fever;
 
-					health += Def::comboHealth * (feverMode == FeverMode::fever ? 5 : 1);
-					score += Def::noteBasicScore * (feverMode == FeverMode::fever ? 2 : 1)
+					health += Def::comboHealth * (feverMode == FeverMode::fever ? 5 : 1) * (bonusMode != BonusMode::noBonus ? 2 : 1);
+					score += Def::noteBasicScore * (feverMode == FeverMode::fever ? 2 : 1) * (bonusMode != BonusMode::noBonus ? 2 : 1)
 						+ combo * Def::comboBonusScore * (feverMode == FeverMode::fever ? 5 : 1);
 					fever += Def::feverIncreaseSpeed;
 					combo++;
@@ -214,6 +238,14 @@ void Game::Update()
 					keyColor[note->ch] = Qt::green;
 					feverBarColor = Qt::white;
 					comboBarColor = Qt::white;
+
+					if (feverMode == FeverMode::notFever && bonusMode == BonusMode::noBonus && 
+						note->bonus != BonusMode::noBonus)
+					{
+						bonusMode = note->bonus;
+						bonusStartTime = time;
+						score += Def::bonusScore;
+					}
 
 					auto p = Def::noteClearParticle;
 					for (int i = 0; i < Def::noteClearParticleNum; i++)
@@ -233,9 +265,10 @@ void Game::Update()
 						note->stat = NoteStat::lost;
 						noteCount += feverMode != FeverMode::fever;
 
-						health += Def::noteMissHealth / (feverMode == FeverMode::fever ? 5 : 1);
+						health += Def::noteMissHealth / (feverMode == FeverMode::fever ? 5 : 1) / (bonusMode != BonusMode::noBonus ? 2 : 1);
 						score += Def::noteMissScore / (feverMode == FeverMode::fever ? 2 : 1);
 						combo = 0;
+						nextBonusCombo = Def::bonusCombo;
 
 						if(feverMode != FeverMode::fever)
 							bottomLightColor = Qt::red;
@@ -276,9 +309,16 @@ void Game::Update()
 			{
 				note->stat = NoteStat::visible;
 
+				if (bonusMode == BonusMode::noBonus && feverMode == FeverMode::notFever 
+					&& combo > nextBonusCombo && Def::RandInt(1, 5) == 1)
+				{
+					note->bonus = Def::RandInt(1, BonusMode::bonusNum - 1);
+					nextBonusCombo = combo + Def::bonusCombo;
+				}
+
 				if (bonusMode == BonusMode::random)
 				{
-					note->x = rand() % (Def::trackWidth - Def::noteTrackWidth / 2) + Def::noteTrackWidth / 2;
+					note->x = Def::RandInt(20, Def::trackWidth - 20);
 				}
 				else if (bonusMode == BonusMode::reverse)
 				{
@@ -311,7 +351,7 @@ void Game::Update()
 				comboBarColor = Qt::red;
 				trackShake = Def::maxTrackShake * (feverMode == FeverMode::fever ? 0 : 1);
 
-				health += Def::noteLostHealth / (feverMode == FeverMode::fever ? 5 : 1);
+				health += Def::noteLostHealth / (feverMode == FeverMode::fever ? 5 : 1) / (bonusMode != BonusMode::noBonus ? 2 : 1);
 				score += Def::noteLostScore / (feverMode == FeverMode::fever ? 2 : 1);
 				combo = 0;
 
@@ -371,6 +411,7 @@ void Game::Update()
 		{
 			feverStartTime = time;
 			feverMode = FeverMode::standby;
+			bonusMode = BonusMode::noBonus;
 		}
 		else if (time - feverStartTime >= Def::feverStandByTime && feverMode == FeverMode::standby)
 		{
@@ -380,6 +421,7 @@ void Game::Update()
 		else if (fever < 0.5 && feverMode == FeverMode::fever)
 		{
 			feverMode = FeverMode::notFever;
+			nextBonusCombo = combo + Def::bonusCombo;
 		}
 
 		if (feverMode == FeverMode::notFever)
@@ -403,6 +445,12 @@ void Game::Update()
 				p.color = bottomLightColor;
 				particleMgr->Cast(time, p);
 			}
+		}
+
+		if (bonusMode != BonusMode::noBonus && time - bonusStartTime > Def::bonusTime[bonusMode])
+		{
+			bonusMode = BonusMode::noBonus;
+			nextBonusCombo = combo + Def::bonusCombo;
 		}
 
 		health = std::min(Def::maxHealth, std::max(health, 0));
@@ -516,63 +564,90 @@ void Game::paintEvent(QPaintEvent* event)
 		painter.setBrush(QBrush(grad));
 		painter.drawRect(QRect(-2, -2, Def::trackWidth + 4, Def::trackHeight + 4));
 
-		//draw fever text
-		if (feverMode == FeverMode::standby)
+		if (stat == GameStat::running)
 		{
-			auto font = painter.font();
-			font.setPixelSize(40);
-			painter.setFont(font);
-			QFontMetrics m(painter.font());
-			int fontSizeX = m.width("FEVER STANDBY");
-			int fontSizeY = m.height();
-
-			painter.translate(Def::trackWidth / 2, Def::trackHeight / 2);
-
-			QColor color = Lerp(feverBarColor, Qt::black, 0.5);
-			painter.setPen(color);
-			
-			painter.scale(1.0, -1.0);
-			painter.drawText(-fontSizeX / 2, -5, "FEVER STANDBY");
-			painter.scale(1.0, -1.0);
-
-			int sec = (Def::feverStandByTime - time + feverStartTime) / 1000 + 1;
-
-			font = painter.font();
-			font.setPixelSize(70);
-			painter.setFont(font);
-			m = QFontMetrics(painter.font());
-
-			if ((time / (20 + sec * 20)) & 1)
+			//draw fever text
+			if (feverMode == FeverMode::standby)
 			{
-				color = Lerp(color, Qt::white, 0.5);
+				auto font = painter.font();
+				font.setPixelSize(40);
+				painter.setFont(font);
+				QFontMetrics m(painter.font());
+				int fontSizeX = m.width("FEVER STANDBY");
+				int fontSizeY = m.height();
+
+				painter.translate(Def::trackWidth / 2, Def::trackHeight / 2);
+
+				QColor color = Lerp(feverBarColor, Qt::black, 0.5);
+				painter.setPen(color);
+
+				painter.scale(1.0, -1.0);
+				painter.drawText(-fontSizeX / 2, -5, "FEVER STANDBY");
+				painter.scale(1.0, -1.0);
+
+				int sec = (Def::feverStandByTime - time + feverStartTime) / 1000 + 1;
+
+				font = painter.font();
+				font.setPixelSize(70);
+				painter.setFont(font);
+				m = QFontMetrics(painter.font());
+
+				if ((time / (20 + sec * 20)) & 1)
+				{
+					color = Lerp(color, Qt::white, 0.5);
+				}
+				fontSizeX = m.width(std::to_string(sec).c_str());
+				fontSizeY = m.height();
+
+				painter.setPen(color);
+				painter.scale(1.0, -1.0);
+				painter.drawText(-fontSizeX / 2, fontSizeY, std::to_string(sec).c_str());
+				painter.scale(1.0, -1.0);
+
+				painter.translate(-Def::trackWidth / 2, -Def::trackHeight / 2);
 			}
-			fontSizeX = m.width(std::to_string(sec).c_str());
-			fontSizeY = m.height();
 
-			painter.setPen(color);
-			painter.scale(1.0, -1.0);
-			painter.drawText(-fontSizeX / 2, fontSizeY, std::to_string(sec).c_str());
-			painter.scale(1.0, -1.0);
-
-			painter.translate(-Def::trackWidth / 2, -Def::trackHeight / 2);
-		}
-
-		//draw particle
-		particleMgr->Show(&painter);
-
-		QFont font = painter.font();
-		font.setPixelSize(Def::noteSize);
-		font.setBold(false);
-		painter.setFont(font);
-
-		//draw note
-		bool first = true;
-		for (auto note : notes)
-		{
-			if (note->stat == NoteStat::visible)
+			//draw bonus text
+			if (bonusMode != BonusMode::noBonus)
 			{
-				note->Show(&painter, first, feverMode == FeverMode::fever);
-				first = false;
+				auto font = painter.font();
+				font.setPixelSize(50);
+				painter.setFont(font);
+				QFontMetrics m(painter.font());
+				int fontSizeX = m.width(Def::bonusTitle[bonusMode].c_str());
+				int fontSizeY = m.height();
+
+				painter.translate(Def::trackWidth / 2, Def::trackHeight / 2);
+
+				QColor color = Lerp(Def::bonusColor[bonusMode], Qt::black, 0.5);
+				painter.setPen(color);
+
+				painter.setOpacity(std::max(0.0, ((2000.0 - (time - bonusStartTime)) / 2000.0)));
+				painter.scale(bonusMode == BonusMode::reverse ? -1.0 : 1.0, -1.0);
+				painter.drawText(-fontSizeX / 2, -fontSizeY / 2, Def::bonusTitle[bonusMode].c_str());
+				painter.scale(bonusMode == BonusMode::reverse ? -1.0 : 1.0, -1.0);
+				painter.setOpacity(1.0);
+
+				painter.translate(-Def::trackWidth / 2, -Def::trackHeight / 2);
+			}
+
+			//draw particle
+			particleMgr->Show(&painter);
+
+			QFont font = painter.font();
+			font.setPixelSize(Def::noteSize);
+			font.setBold(false);
+			painter.setFont(font);
+
+			//draw note
+			bool first = true;
+			for (auto note : notes)
+			{
+				if (note->stat == NoteStat::visible)
+				{
+					note->Show(&painter, first, feverMode == FeverMode::fever);
+					first = false;
+				}
 			}
 		}
 
@@ -703,8 +778,21 @@ void Game::keyPressEvent(QKeyEvent* event)
 	{
 		return;
 	}
-
 	int key = event->key();
+
+	if (key == Qt::Key::Key_Escape)
+	{
+		if (stat == GameStat::paused)
+		{
+			this->Continue();
+		}
+		else if (stat == GameStat::running)
+		{
+			this->Pause();
+		}
+		return;
+	}
+
 	if (!keyHolding[key])
 	{
 		keyHolding[key] = true;

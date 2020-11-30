@@ -12,6 +12,16 @@ enum NoteStat
 	lost
 };
 
+enum BonusMode
+{
+	noBonus,
+	fast,
+	slow,
+	reverse,
+	random,
+	bonusNum
+};
+
 class Note
 {
 public:
@@ -22,6 +32,8 @@ public:
 	double y;
 
 	int stat;
+
+	int bonus;
 
 	bool wordBegin;
 

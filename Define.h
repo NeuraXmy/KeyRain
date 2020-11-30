@@ -3,6 +3,7 @@
 #include <string>
 
 struct Particle;
+class QColor;
 
 namespace Def
 {
@@ -73,6 +74,12 @@ namespace Def
 	extern const Particle noteDragParticle;
 	extern const int feverParticleInterval;;
 	extern const Particle feverParticle;
+
+	extern const int bonusCombo;
+	extern const int bonusTime[];
+	extern const std::string bonusTitle[];
+	extern const QColor bonusColor[];
+	extern const int bonusScore;
 
 	int RandInt(int l, int r);
 
