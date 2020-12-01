@@ -1,3 +1,5 @@
+//Define.cpp: 公共变量和函数的定义
+
 #include "Define.h"
 #include "Particle.h"
 
@@ -8,14 +10,20 @@ namespace Def
 {
 	const double pi = acos(-1.0);
 
+	//---------------------程序相关------------------------//
+
 	const int tickTime = 10;
 	const double tickCount = 1000.0 / tickTime;
+
 	const int frameTime = 10;
-	const double frameCount = 1000.0 / frameTime;
 
 	const int inputTickTime = 10;
 
+	const int uiTick = 20;
+
 	const std::string resPath = "./res/";
+
+	//---------------------视觉相关------------------------//
 
 	const int keySize = 45;
 	const int keySpace = 7;
@@ -48,11 +56,33 @@ namespace Def
 	const double trackShakeDecreseSpeed = 0.15;
 
 	const int noteSize = 45;
-
 	const int noteTrackWidth = 45;
 
 	const int scorePosX = 35;
 	const int scorePosY = 200;
+
+	const std::string bonusTitle[] =
+	{
+		"",
+		"SPEED UP",
+		"SLOW DOWN",
+		"REVERSE",
+		"RANDOM"
+	};
+	const QColor bonusColor[] =
+	{
+		QColor(0, 0, 0),
+		QColor(10, 50, 255),
+		QColor(255, 50, 10),
+		QColor(50, 255, 255),
+		QColor(255, 50, 200)
+	};
+
+	const QColor btnColor = Qt::green;
+	const QColor btnHoverColor = Qt::yellow;
+	const QColor btnDownColor = Qt::white;
+
+	//---------------------游戏内容相关--------------------//
 
 	const int noteBasicScore = 20;
 	const int comboBonusScore = 1;
@@ -79,47 +109,35 @@ namespace Def
 	const double noteIntervalEnd = 0.15;
 	const double noteProcessFeverEffect = 10.0;
 
-	const int particleFlashInterval = 20;
-
-	const int noteClearParticleNum = 3;
-	const Particle noteClearParticle = Particle(500, 0.01, 7);
-	const int noteLostParticleNum = 4;
-	const Particle noteLostParticle = Particle(500, 0.01, 7, Qt::red);
-	const int noteDragParticleInterval = 300;
-	const Particle noteDragParticle = Particle(500, 0.005, 5);
-	const int feverParticleInterval = 300;
-	const Particle feverParticle = Particle(3000, 0.005, 5);
-
 	const int bonusCombo = 20;
 	const int bonusTime[] =
 	{
 		0, 10000, 10000, 10000, 10000
 	};
-	const std::string bonusTitle[] =
-	{
-		"",
-		"SPEED UP",
-		"SLOW DOWN",
-		"REVERSE",
-		"RANDOM"
-	};
-	const QColor bonusColor[] =
-	{
-		QColor(0, 0, 0),
-		QColor(10, 50, 255),
-		QColor(255, 50, 10),
-		QColor(50, 255, 255),
-		QColor(255, 50, 200)
-	};
+
 	const int bonusScore = 100;
 
-	const int uiTick = 20;
+	//---------------------粒子效果相关--------------------//
 
-	const QColor btnColor = Qt::green;
-	const QColor btnHoverColor = Qt::yellow;
-	const QColor btnDownColor = Qt::white;
+	const int particleFlashInterval = 20;
 
+	const int noteClearParticleNum = 3;
+	const Particle noteClearParticle = Particle(500, 0.01, 7);
+
+	const int noteLostParticleNum = 4;
+	const Particle noteLostParticle = Particle(500, 0.01, 7, Qt::red);
+
+	const int noteDragParticleInterval = 300;
+	const Particle noteDragParticle = Particle(500, 0.005, 5);
+
+	const int feverParticleInterval = 300;
+	const Particle feverParticle = Particle(3000, 0.005, 5);
+
+	//---------------------工具函数------------------------//
+
+	//随机数引擎
 	std::default_random_engine re;
+
 	int RandInt(int l, int r)
 	{
 		std::uniform_int_distribution<int> u(l, r);
