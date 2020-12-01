@@ -14,6 +14,8 @@ namespace Def
 	extern const int frameTime;
 	extern const double frameCount;
 
+	extern const int inputTickTime;
+
 	extern const std::string resPath;
 
 	extern const int keySize;
@@ -66,6 +68,8 @@ namespace Def
 	extern const double noteIntervalEnd;
 	extern const double noteProcessFeverEffect;
 
+	extern const int particleFlashInterval;
+
 	extern const int noteClearParticleNum;
 	extern const Particle noteClearParticle;
 	extern const int noteLostParticleNum;
@@ -80,6 +84,12 @@ namespace Def
 	extern const std::string bonusTitle[];
 	extern const QColor bonusColor[];
 	extern const int bonusScore;
+
+	extern const int uiTick;
+
+	extern const QColor btnColor;
+	extern const QColor btnHoverColor;
+	extern const QColor btnDownColor;
 
 	int RandInt(int l, int r);
 

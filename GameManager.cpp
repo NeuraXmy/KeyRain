@@ -1,7 +1,8 @@
-#include "Game.h"
+#include "GameManager.h"
 #include "Define.h"
 #include "Note.h"
 #include "Particle.h"
+#include "ParticleManager.h"
 
 #include <qpainter.h>
 #include <qevent.h>
@@ -46,14 +47,32 @@ static QColor Lerp(const QColor& s, const QColor& t, double rate)
 	return QColor(r, g, b);
 }
 
-Game::Game(QWidget* parent)
-	: QWidget(parent)
+
+namespace
+{
+	GameManager* instance = nullptr;
+}
+
+GameManager* GameManager::GetInstance()
+{
+	if (!instance)
+	{
+		instance = new GameManager();
+	}
+	return instance;
+}
+
+void GameManager::ReleaseInstance()
+{
+	delete instance;
+}
+
+GameManager::GameManager()
+	: QWidget()
 {
 	this->resize(Def::windowWidth, Def::windowHeight);
 
 	timerId = QObject::startTimer(1, Qt::TimerType::PreciseTimer);
-
-	particleMgr = new ParticleManager;
 
 	interfaceImage	= new QImage((Def::resPath + "tex/interface.png").c_str());
 	keyImage		= new QImage((Def::resPath + "tex/key.png").c_str());
@@ -64,7 +83,7 @@ Game::Game(QWidget* parent)
 	ResetAll();
 }
 
-Game::~Game()
+GameManager::~GameManager()
 {
 	ResetAll();
 
@@ -73,13 +92,13 @@ Game::~Game()
 	delete interfaceImage;
 	delete keyImage;
 	delete keyDownImage;
-
-	delete particleMgr;
 }
 
-void Game::ResetAll()
+
+
+void GameManager::ResetAll()
 {
-	particleMgr->Clear();
+	ParticleManager::GetInstacne()->Clear();
 
 	for (auto note : notes)
 	{
@@ -129,7 +148,7 @@ void Game::ResetAll()
 	trackShake = 0.0;
 }
 
-void Game::InitNotes()
+void GameManager::InitNotes()
 {
 	for (auto note : notes)
 	{
@@ -154,8 +173,9 @@ void Game::InitNotes()
 	}
 }
 
-void Game::Update()
+void GameManager::Update()
 {
+
 	if (stat == GameStat::running)
 	{
 		time += Def::tickTime;
@@ -221,6 +241,10 @@ void Game::Update()
 
 		for (auto key : keys)
 		{
+			if (key > Qt::Key::Key_Z || key < Qt::Key::Key_A)
+			{
+				continue;
+			}
 			for (auto note : notes)
 			{
 				if (note->stat == NoteStat::visible && QKey2Ch(key) == note->ch)
@@ -250,10 +274,10 @@ void Game::Update()
 					auto p = Def::noteClearParticle;
 					for (int i = 0; i < Def::noteClearParticleNum; i++)
 					{
-						p.color = note->color;
-						p.v = GetRandomVelocity(200.0, false, 100.0);
+						p.color = note->particleColor;
+						p.v = ParticleManager::GetRandomVelocity(200.0, false, 100.0);
 						p.pos = std::make_pair(note->x + p.v.first / 200.0 * Def::keySize * 0.5, note->y + p.v.second / 200.0 * Def::keySize * 0.5);
-						particleMgr->Cast(time, p);
+						ParticleManager::GetInstacne()->Cast(time, p);
 					}
 
 					break;
@@ -280,9 +304,9 @@ void Game::Update()
 						auto p = Def::noteLostParticle;
 						for (int i = 0; i < Def::noteLostParticleNum; i++)
 						{
-							p.v = GetRandomVelocity(200.0, false, 100.0);
+							p.v = ParticleManager::GetRandomVelocity(200.0, false, 100.0);
 							p.pos = std::make_pair(note->x + p.v.first / 200.0 * Def::keySize * 0.5, note->y + p.v.second / 200.0 * Def::keySize * 0.5);
-							particleMgr->Cast(time, p);
+							ParticleManager::GetInstacne()->Cast(time, p);
 						}
 					}		
 					
@@ -293,9 +317,11 @@ void Game::Update()
 		keys.clear();
 
 		bool hasRestNotes = false;
-
+		
+		int interval = noteInterval * noteSpeed;
+		
+		double lastNoteY = -100 * Def::trackHeight;
 		double lastNoteX = Def::noteTrackWidth / 2;
-		double lastNoteY = -Def::trackHeight * 100.0;
 
 		for (auto note : notes)
 		{
@@ -305,7 +331,7 @@ void Game::Update()
 			}
 
 			if (note->stat == NoteStat::hidden && Def::trackHeight - lastNoteY 
-				>= noteInterval * noteSpeed * (note->wordBegin ? (feverMode == FeverMode::fever ? 2.5 : 2) : 1))
+				>= interval * (note->wordBegin ? (feverMode == FeverMode::fever ? 2.5 : 2) : 1))
 			{
 				note->stat = NoteStat::visible;
 
@@ -358,9 +384,9 @@ void Game::Update()
 				auto p = Def::noteLostParticle;
 				for (int i = 0; i < Def::noteLostParticleNum; i++)
 				{
-					p.v = GetRandomVelocity(200.0, false, 100.0);
+					p.v = ParticleManager::GetRandomVelocity(200.0, false, 100.0);
 					p.pos = std::make_pair(note->x + p.v.first / 200.0 * Def::keySize * 0.5, note->y + p.v.second / 200.0 * Def::keySize * 0.5);
-					particleMgr->Cast(time, p);
+					ParticleManager::GetInstacne()->Cast(time, p);
 				}
 			}
 
@@ -378,10 +404,10 @@ void Game::Update()
 				if (time - note->lastCastDragParticleTime > Def::noteDragParticleInterval)
 				{
 					auto p = Def::noteDragParticle;
-					p.color = note->color;
-					p.v = GetRandomVelocity(20.0, false, 0.0);
-					p.pos = GetRandomSquarePos(note->x - Def::keySize * 0.3, note->y + Def::keySize * 0.4, note->x + Def::keySize * 0.3, note->y + Def::keySize * 0.2);
-					particleMgr->Cast(time, p);
+					p.color = note->particleColor;
+					p.v = ParticleManager::GetRandomVelocity(20.0, false, 0.0);
+					p.pos = ParticleManager::GetRandomSquarePos(note->x - Def::keySize * 0.3, note->y + Def::keySize * 0.4, note->x + Def::keySize * 0.3, note->y + Def::keySize * 0.2);
+					ParticleManager::GetInstacne()->Cast(time, p);
 					note->lastCastDragParticleTime = time;
 				}
 			}
@@ -440,10 +466,10 @@ void Game::Update()
 			{
 				lastCastFeverParticleTime = time;
 				auto p = Def::feverParticle;
-				p.pos = GetRandomSquarePos(10, Def::trackHeight + 10, Def::trackWidth - 10, Def::trackHeight + 10);
+				p.pos = ParticleManager::GetRandomSquarePos(10, Def::trackHeight + 10, Def::trackWidth - 10, Def::trackHeight + 10);
 				p.v = std::make_pair(0, -noteSpeed);
 				p.color = bottomLightColor;
-				particleMgr->Cast(time, p);
+				ParticleManager::GetInstacne()->Cast(time, p);
 			}
 		}
 
@@ -456,11 +482,11 @@ void Game::Update()
 		health = std::min(Def::maxHealth, std::max(health, 0));
 		fever = std::min(Def::maxFever, std::max(fever, 0.0));
 
-		particleMgr->Update(time);
+		ParticleManager::GetInstacne()->Update(time);
 	}
 }
 
-bool Game::LoadLevel(const std::string& name)
+bool GameManager::LoadLevel(const std::string& name)
 {
 	std::string path = Def::resPath + "level/" + name + ".lv";
 
@@ -486,7 +512,7 @@ bool Game::LoadLevel(const std::string& name)
 	return true;
 }
 
-void Game::Start(const std::string& name)
+void GameManager::Start(const std::string& name)
 {
 	ResetAll();
 
@@ -502,19 +528,38 @@ void Game::Start(const std::string& name)
 	qDebug() << "[INFO] Game started";
 }
 
-void Game::Pause()
+void GameManager::OnPause()
 {
 	stat = GameStat::paused;
 	qDebug() << "[INFO] Game paused";
 }
 
-void Game::Continue()
+void GameManager::OnResume()
 {
 	stat = GameStat::running;
 	qDebug() << "[INFO] Game continued";
 }
 
-void Game::timerEvent(QTimerEvent* event)
+int GameManager::GetStat() const
+{
+	return stat;
+}
+
+void GameManager::OnKeyPressEvent(int key)
+{
+	if (!keyHolding[key])
+	{
+		keyHolding[key] = true;
+		keys.push_back(key);
+	}
+}
+
+void GameManager::OnKeyReleaseEvent(int key)
+{
+	keyHolding[key] = false;
+}
+
+void GameManager::timerEvent(QTimerEvent* event)
 {
 	if (event->timerId() != this->timerId)
 	{
@@ -540,7 +585,7 @@ void Game::timerEvent(QTimerEvent* event)
 	clock->start();
 }
 
-void Game::paintEvent(QPaintEvent* event)
+void GameManager::paintEvent(QPaintEvent* event)
 {
 	QPainter painter(this);
 	painter.scale(1.0, -1.0);
@@ -554,8 +599,8 @@ void Game::paintEvent(QPaintEvent* event)
 		double shakeY = std::cos(time) * trackShake;
 		trackShake *= (1.0 - Def::trackShakeDecreseSpeed);
 		if (trackShake < 1.0) trackShake = 0.0;
-		painter.translate(shakeX, shakeY);
-		painter.translate(Def::trackPosX, Def::trackPosY);
+
+		painter.translate(Def::trackPosX + shakeX, Def::trackPosY + shakeY);
 
 		//draw background
 		QLinearGradient grad(QPointF(0, -Def::trackHeight), QPointF(0, Def::trackHeight));
@@ -632,7 +677,7 @@ void Game::paintEvent(QPaintEvent* event)
 			}
 
 			//draw particle
-			particleMgr->Show(&painter);
+			ParticleManager::GetInstacne()->Show(&painter);
 
 			QFont font = painter.font();
 			font.setPixelSize(Def::noteSize);
@@ -651,8 +696,7 @@ void Game::paintEvent(QPaintEvent* event)
 			}
 		}
 
-		painter.translate(-Def::trackPosX, -Def::trackPosY);
-		painter.translate(-shakeX, -shakeY);
+		painter.translate(-Def::trackPosX - shakeX, -Def::trackPosY - shakeY);
 	}
 
 	//draw score
@@ -677,11 +721,11 @@ void Game::paintEvent(QPaintEvent* event)
 
 			comboBarColor = Lerp(comboBarColor, QColor(Qt::yellow), 0.1);
 			painter.setPen(comboBarColor);
-			painter.drawText(0, 0, ("[Combo]  " + std::to_string(combo)).c_str());
+			painter.drawText(0, 0, ("[COMBO]  " + std::to_string(combo)).c_str());
 
 			scoreBarColor = Lerp(scoreBarColor, QColor(Qt::green), 0.1);
 			painter.setPen(scoreBarColor);
-			painter.drawText(0, -scoreFontSize - 5, ("[Score]  " + std::to_string(scoreDisplaying)).c_str());
+			painter.drawText(0, -scoreFontSize - 5, ("[SCORE]  " + std::to_string(scoreDisplaying)).c_str());
 
 			painter.scale(1.0, -1.0);
 		}
@@ -770,43 +814,4 @@ void Game::paintEvent(QPaintEvent* event)
 			painter.translate(-GetKeyPosX(ch), -GetKeyPosY(ch));
 		}
 	}
-}
-
-void Game::keyPressEvent(QKeyEvent* event)
-{
-	if (event->isAutoRepeat())
-	{
-		return;
-	}
-	int key = event->key();
-
-	if (key == Qt::Key::Key_Escape)
-	{
-		if (stat == GameStat::paused)
-		{
-			this->Continue();
-		}
-		else if (stat == GameStat::running)
-		{
-			this->Pause();
-		}
-		return;
-	}
-
-	if (!keyHolding[key])
-	{
-		keyHolding[key] = true;
-		keys.push_back(key);
-	}
-}
-
-void Game::keyReleaseEvent(QKeyEvent* event)
-{
-	if (event->isAutoRepeat())
-	{
-		return;
-	}
-
-	int key = event->key();
-	keyHolding[key] = false;
-}
+} 

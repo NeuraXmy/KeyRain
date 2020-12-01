@@ -9,6 +9,7 @@
 
 class Note;
 class ParticleManager;
+class UiManager;
 
 class QTime;
 class QImage;
@@ -28,22 +29,27 @@ enum FeverMode
 	fever
 };
 
-class Game : public QWidget
+class GameManager : public QWidget
 {
 	Q_OBJECT
 
 public:
 
-	Game(QWidget* parent = nullptr);
+	static GameManager* GetInstance();
 
-	~Game();
-
+	static void ReleaseInstance();
 
 	void Start(const std::string& name);
 
-	void Pause();
+	int GetStat() const;
+	
+	void OnPause();
 
-	void Continue();
+	void OnResume();
+
+	void OnKeyPressEvent(int key);
+
+	void OnKeyReleaseEvent(int key);
 
 protected:
 
@@ -51,15 +57,9 @@ protected:
 
 	void paintEvent(QPaintEvent* event) override;
 
-	void keyPressEvent(QKeyEvent* event) override;
-
-	void keyReleaseEvent(QKeyEvent* event) override;
-
 private:
 
 	QTime* clock;
-
-	ParticleManager* particleMgr;
 
 	int timerId;
 
@@ -111,6 +111,10 @@ private:
 	double noteSpeed;
 	double noteSlowDown;
 	double noteInterval;
+
+	GameManager();
+
+	~GameManager();
 
 	void ResetAll();
 

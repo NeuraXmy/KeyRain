@@ -13,6 +13,8 @@ namespace Def
 	const int frameTime = 10;
 	const double frameCount = 1000.0 / frameTime;
 
+	const int inputTickTime = 10;
+
 	const std::string resPath = "./res/";
 
 	const int keySize = 45;
@@ -77,6 +79,8 @@ namespace Def
 	const double noteIntervalEnd = 0.15;
 	const double noteProcessFeverEffect = 10.0;
 
+	const int particleFlashInterval = 20;
+
 	const int noteClearParticleNum = 3;
 	const Particle noteClearParticle = Particle(500, 0.01, 7);
 	const int noteLostParticleNum = 4;
@@ -108,6 +112,12 @@ namespace Def
 		QColor(255, 50, 200)
 	};
 	const int bonusScore = 100;
+
+	const int uiTick = 20;
+
+	const QColor btnColor = Qt::green;
+	const QColor btnHoverColor = Qt::yellow;
+	const QColor btnDownColor = Qt::white;
 
 	std::default_random_engine re;
 	int RandInt(int l, int r)
