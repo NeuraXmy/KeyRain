@@ -21,6 +21,7 @@ enum GameStat
 {
 	running,
 	preparing,
+	gameStandby,
 	paused,
 	ended
 };
@@ -44,6 +45,14 @@ struct GameRecord
 	int score;
 	std::string levelName;
 	std::string time;
+
+	int rank;
+
+	//在优先队列中先按分数从大到小，再按时间从早到晚排
+	bool operator<(const GameRecord& r) const
+	{
+		return score == r.score ? time > r.time : score < r.score;
+	}
 };
 
 

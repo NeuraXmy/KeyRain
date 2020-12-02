@@ -1,5 +1,8 @@
 CPP KEYWORDS
 
+cout
+cin
+main
 auto
 bool
 break

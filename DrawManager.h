@@ -4,6 +4,8 @@
 
 #include <qwidget.h>
 
+
+
 /**
 * DrawManager (QWidget)
 * 控制所有绘图操作的单例类型
@@ -18,11 +20,17 @@ public:
 
 	static void ReleaseInstance();
 
+signals:
+
+	void WindowCloseSignal();
+
 protected:
 
 	void timerEvent(QTimerEvent* event) override;
 
 	void paintEvent(QPaintEvent* event) override;
+
+	void closeEvent(QCloseEvent* event) override;
 
 private:
 

@@ -2,6 +2,7 @@
 
 #include "DrawManager.h"
 #include "Define.h"
+#include "Standing.h"
 
 #include "GameManager.h"
 #include "ParticleManager.h"
@@ -77,6 +78,12 @@ void DrawManager::paintEvent(QPaintEvent* event)
 
 	GameManager::GetInstance()->DrawGui(&painter);
 
+}
+
+void DrawManager::closeEvent(QCloseEvent* event)
+{
+	Standing::GetInstance()->SaveRecord();
+	emit WindowCloseSignal();
 }
 
 

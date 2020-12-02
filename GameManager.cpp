@@ -134,8 +134,6 @@ void GameManager::ResetAll()
 
 	words.clear();
 
-	levelName = std::string("Null");
-
 	stat = GameStat::preparing;
 
 	bonusMode = BonusMode::noBonus;
@@ -236,7 +234,7 @@ bool GameManager::OnStart(const std::string& name)
 
 	InitNotes();
 
-	stat = GameStat::running;
+	stat = GameStat::gameStandby;
 	qDebug() << "[INFO] Game started";
 
 	return true;
@@ -244,14 +242,20 @@ bool GameManager::OnStart(const std::string& name)
 
 void GameManager::OnPause()
 {
-	stat = GameStat::paused;
-	qDebug() << "[INFO] Game paused";
+	if (stat == GameStat::running)
+	{
+		stat = GameStat::paused;
+		qDebug() << "[INFO] Game paused";
+	}
 }
 
 void GameManager::OnResume()
 {
-	stat = GameStat::running;
-	qDebug() << "[INFO] Game continued";
+	if (stat == GameStat::paused)
+	{
+		stat = GameStat::running;
+		qDebug() << "[INFO] Game continued";
+	}
 }
 
 void GameManager::OnExit()
@@ -282,7 +286,7 @@ void GameManager::timerEvent(QTimerEvent* event)
 		return;
 	}
 
-	static int updateTime	= 0;
+	static int updateTime = 0;
 	
 	while (updateTime >= Def::tickTime) 
 	{
@@ -298,7 +302,15 @@ void GameManager::timerEvent(QTimerEvent* event)
 
 void GameManager::Update()
 {
-	if (stat == GameStat::running)
+	if (stat == GameStat::gameStandby)
+	{
+		time += Def::tickTime;
+		if (time >= Def::gameStandbyTime)
+		{
+			stat = GameStat::running;
+		}
+	}
+	else if (stat == GameStat::running)
 	{
 		//-----------------------------------游戏运行--------------------------------------//
 
@@ -746,8 +758,12 @@ void GameManager::Update()
 
 		if (health == 0)
 		{
+			emit GameOverSignal(GameRecord{ 
+				score, 
+				levelName, 
+				QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss").toStdString() 
+				});
 			ResetAll();
-			emit GameOverSignal(GameRecord{ score, levelName, QDateTime::currentDateTime().toString().toStdString() });
 		}
 
 		//----------------------------------更新粒子管理器-----------------------------------//
@@ -774,6 +790,35 @@ void GameManager::DrawTrack(QPainter* painter) const
 	grad.setColorAt(bottomLightHeight, Qt::black);
 	painter->setBrush(QBrush(grad));
 	painter->drawRect(QRect(-2, -2, Def::trackWidth + 4, Def::trackHeight + 4));
+
+	
+	if (stat == GameStat::gameStandby)
+	{
+		//draw standby text
+		painter->translate(Def::trackWidth / 2, Def::trackHeight / 2 + 50);
+
+		int sec = std::ceil((Def::gameStandbyTime - time) / 1000.0);
+
+		QColor color = Qt::green;
+		if ((time / (20 + sec * 20)) & 1)
+		{
+			color = Lerp(color, Qt::white, 0.7);
+		}
+
+		auto font = painter->font();
+		font.setPixelSize(80);
+		painter->setFont(font);
+		auto m = QFontMetrics(painter->font());
+		int fontSizeX = m.width(std::to_string(sec).c_str());
+		int fontSizeY = m.height();
+
+		painter->setPen(color);
+		painter->scale(1.0, -1.0);
+		painter->drawText(-fontSizeX / 2, fontSizeY, std::to_string(sec).c_str());
+		painter->scale(1.0, -1.0);
+
+		painter->translate(-Def::trackWidth / 2, -Def::trackHeight / 2 - 50);
+	}
 
 	if (stat == GameStat::running)
 	{

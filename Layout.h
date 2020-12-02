@@ -26,10 +26,10 @@ public:
 
 
 	//进入该界面
-	void Enter();
+	void Enter(bool withAnimation = true);
 
 	//退出该界面
-	void Exit();
+	void Exit(bool withAnimation = true);
 	
 
 
@@ -57,8 +57,8 @@ public:
 
 private:
 
-	int x;
-	int y;
+	mutable double x;
+	mutable double y;
 
 	bool visible;
 

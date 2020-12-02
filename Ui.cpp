@@ -7,6 +7,7 @@
 #include "GameManager.h"
 #include "Layout.h"
 #include "Define.h"
+#include "Standing.h"
 
 #include "Button.h"
 #include "Text.h"
@@ -29,6 +30,13 @@ namespace Ui
 	Layout standingLayout;
 
 	RecordList* levelList;
+	RecordList* standingRankList;
+	RecordList* standingScoreList;
+	RecordList* standingLevelNameList;
+	RecordList* standingTimeList;
+
+	Text* ggScoreText;
+	Text* ggLevelNameText;
 
 	std::vector<std::string> levelPaths;
 
@@ -44,17 +52,23 @@ namespace Ui
 		//游戏暂停
 		void GamePause()
 		{
-			GameManager::GetInstance()->OnPause();
-			//跳转到暂停界面
-			UiManager::GetInstance()->Enter(&pauseLayout);
+			if (GameManager::GetInstance()->GetStat() == GameStat::running)
+			{
+				GameManager::GetInstance()->OnPause();
+				//跳转到暂停界面
+				UiManager::GetInstance()->Enter(&pauseLayout);
+			}
 		}
 
 		//游戏继续
 		void GameResume()
 		{
-			GameManager::GetInstance()->OnResume();
-			//回退到游戏界面
-			UiManager::GetInstance()->Back();
+			if (GameManager::GetInstance()->GetStat() == GameStat::paused)
+			{
+				GameManager::GetInstance()->OnResume();
+				//回退到游戏界面
+				UiManager::GetInstance()->Back();
+			}
 		}
 
 		//游戏退出
@@ -78,7 +92,8 @@ namespace Ui
 			//退回主界面
 			UiManager::GetInstance()->Back();
 			//设置结束界面数据
-			
+			ggLevelNameText->SetStr(record.levelName);
+			ggScoreText->SetStr(std::to_string(record.score));
 			//跳到结束界面
 			UiManager::GetInstance()->Enter(&gameOverLayout);
 		}
@@ -131,7 +146,14 @@ namespace Ui
 			UiManager::GetInstance()->Enter(&standingLayout);
 			//加载排名
 			{
-
+				auto records = Standing::GetInstance()->GetRecord();
+				for (auto record : records)
+				{
+					standingRankList->AddRecord(std::to_string(record.rank));
+					standingScoreList->AddRecord(std::to_string(record.score));
+					standingLevelNameList->AddRecord(record.levelName);
+					standingTimeList->AddRecord(record.time);
+				}
 			}
 		}
 
@@ -211,13 +233,13 @@ namespace Ui
 			text->anchor = Anchor::Center;
 
 			//向上按钮
-			Button* upBtn = new Button("", Qt::Key::Key_Up);
+			Button* upBtn = new Button("UP", Qt::Key::Key_Up);
 			upBtn->x = Def::trackWidth * 0.75, upBtn->y = Def::trackHeight / 2 - 60 + 120;
 			upBtn->w = 100, upBtn->h = 35;
 			upBtn->anchor = Anchor::Center;
 
 			//向下按钮
-			Button* downBtn = new Button("", Qt::Key::Key_Down);
+			Button* downBtn = new Button("DOWN", Qt::Key::Key_Down);
 			downBtn->x = Def::trackWidth * 0.75, downBtn->y = Def::trackHeight / 2 - 60 - 120;
 			downBtn->w = 100, downBtn->h = 35;
 			downBtn->anchor = Anchor::Center;
@@ -298,14 +320,34 @@ namespace Ui
 			text->x = Def::trackWidth / 2, text->y = Def::trackHeight / 2 + 100;
 			text->anchor = Anchor::Center;
 
-			//ok按钮
-			Button* okBtn = new Button("OK", Qt::Key::Key_Escape);
+			Text* nameText = new Text("[ DICTIONARY ]", 25, Qt::green);
+			nameText->x = Def::trackWidth / 2, nameText->y = 270;
+			nameText->anchor = Anchor::Center;
+
+			ggLevelNameText = new Text("LEVEL NAME", 30, Qt::yellow);
+			ggLevelNameText->x = Def::trackWidth / 2, ggLevelNameText->y = 230;
+			ggLevelNameText->anchor = Anchor::Center;
+
+			Text* scoreText = new Text("[ YOUR SCORE ]", 25, Qt::green);
+			scoreText->x = Def::trackWidth / 2, scoreText->y = 180;
+			scoreText->anchor = Anchor::Center;
+
+			ggScoreText = new Text("SCORE", 40, Qt::yellow);
+			ggScoreText->x = Def::trackWidth / 2, ggScoreText->y = 130;
+			ggScoreText->anchor = Anchor::Center;
+
+			//返回按钮
+			Button* okBtn = new Button("BACK", Qt::Key::Key_Escape);
 			okBtn->x = Def::trackWidth / 2, okBtn->y = 50;
 			okBtn->w = 160, okBtn->h = 35;
 			okBtn->anchor = Anchor::Center;
 			QObject::connect(okBtn, &Button::ClickSignal, &Action::Back);
 
 			gameOverLayout.AddWidget(text);
+			gameOverLayout.AddWidget(nameText);
+			gameOverLayout.AddWidget(ggLevelNameText);
+			gameOverLayout.AddWidget(ggScoreText);
+			gameOverLayout.AddWidget(scoreText);
 			gameOverLayout.AddWidget(okBtn);
 
 			QObject::connect(GameManager::GetInstance(), &GameManager::GameOverSignal, &Action::GameOver);
@@ -341,6 +383,56 @@ namespace Ui
 			backBtn->anchor = Anchor::LeftBottom;
 			QObject::connect(backBtn, &Button::ClickSignal, &Action::Back);
 
+			//向上按钮
+			Button* upBtn = new Button("UP", Qt::Key::Key_Up);
+			upBtn->x = 200, upBtn->y = 10;
+			upBtn->w = 100, upBtn->h = 35;
+			backBtn->anchor = Anchor::LeftBottom;
+
+			//向下按钮
+			Button* downBtn = new Button("DOWN", Qt::Key::Key_Down);
+			downBtn->x = 350, downBtn->y = 10;
+			downBtn->w = 100, downBtn->h = 35;
+			backBtn->anchor = Anchor::LeftBottom;
+
+			//排名信息
+			standingRankList = new RecordList(15);
+			standingRankList->x = 5, standingRankList->y = 70;
+			standingRankList->w = Def::trackWidth * 0.9, standingRankList->h = Def::trackHeight * 0.6;
+			standingRankList->anchor = Anchor::LeftBottom;
+			standingRankList->BindDownButton(downBtn);
+			standingRankList->BindUpButton(upBtn);
+
+			//分数信息
+			standingScoreList = new RecordList(15);
+			standingScoreList->x = 50, standingScoreList->y = 70;
+			standingScoreList->w = Def::trackWidth * 0.9, standingScoreList->h = Def::trackHeight * 0.6;
+			standingScoreList->anchor = Anchor::LeftBottom;
+			standingScoreList->BindDownButton(downBtn);
+			standingScoreList->BindUpButton(upBtn);
+
+			//关卡名信息
+			standingLevelNameList = new RecordList(15);
+			standingLevelNameList->x = 150, standingLevelNameList->y = 70;
+			standingLevelNameList->w = Def::trackWidth * 0.9, standingLevelNameList->h = Def::trackHeight * 0.6;
+			standingLevelNameList->anchor = Anchor::LeftBottom;
+			standingLevelNameList->BindDownButton(downBtn);
+			standingLevelNameList->BindUpButton(upBtn);
+
+			//时间信息
+			standingTimeList = new RecordList(15);
+			standingTimeList->x = 310, standingTimeList->y = 70;
+			standingTimeList->w = Def::trackWidth * 0.9, standingTimeList->h = Def::trackHeight * 0.6;
+			standingTimeList->anchor = Anchor::LeftBottom;
+			standingTimeList->BindDownButton(downBtn);
+			standingTimeList->BindUpButton(upBtn);
+
+			standingLayout.AddWidget(standingRankList);
+			standingLayout.AddWidget(standingScoreList);
+			standingLayout.AddWidget(standingLevelNameList);
+			standingLayout.AddWidget(standingTimeList);
+			standingLayout.AddWidget(downBtn);
+			standingLayout.AddWidget(upBtn);
 			standingLayout.AddWidget(backBtn);
 		}
 

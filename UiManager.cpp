@@ -126,6 +126,9 @@ void UiManager::timerEvent(QTimerEvent* event)
 
 	time += Def::uiTick;
 
-	layouts.back()->Update(time);
+	for (auto layout : drawList)
+	{
+		layout->Update(time);
+	}
 }
 

@@ -68,6 +68,8 @@ namespace Def
 
 	//---------------------游戏内容相关--------------------//
 
+	extern const int gameStandbyTime;
+
 	extern const int noteBasicScore;
 	extern const int comboBonusScore;
 	extern const int noteLostScore;

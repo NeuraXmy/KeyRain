@@ -9,6 +9,7 @@
 #include "ParticleManager.h"
 #include "DrawManager.h"
 
+#include "Standing.h"
 #include "Ui.h"
 
 #include <qdatetime.h>
@@ -69,6 +70,8 @@ Application::~Application()
 	ParticleManager::ReleaseInstance();
 	DrawManager::ReleaseInstance();
 	UiManager::ReleaseInstance();
+
+	Standing::ReleaseInstance();
 }
 
 
@@ -90,6 +93,9 @@ void Application::InitSingalSlots()
 		UiManager::GetInstance(), &UiManager::OnMouseLeftBtnPressEvent);
 	connect(InputManager::GetInstance(), &InputManager::MouseLeftBtnReleaseSignal,
 		UiManager::GetInstance(), &UiManager::OnMouseLeftBtnReleaseEvent);
+
+	connect(GameManager::GetInstance(), &GameManager::GameOverSignal,
+		Standing::GetInstance(), &Standing::AddRecord);
 }
 
 void Application::Start()
@@ -99,9 +105,14 @@ void Application::Start()
 
 	//初始化ui
 	Ui::Init();
+
+	//加载排名
+	Standing::GetInstance()->LoadRecord();
 }
 
 void Application::Exit()
 {
+	Standing::GetInstance()->SaveRecord();
+
 	ReleaseInstance();
 }

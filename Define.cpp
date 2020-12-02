@@ -90,6 +90,8 @@ namespace Def
 
 	//---------------------游戏内容相关--------------------//
 
+	const int gameStandbyTime = 3000;
+
 	const int noteBasicScore = 20;
 	const int comboBonusScore = 1;
 	const int noteLostScore = -10;

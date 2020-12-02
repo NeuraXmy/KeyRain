@@ -8,7 +8,7 @@
 
 Layout::Layout()
 	: x(0)
-	, y(0)
+	, y(-Def::trackHeight)
 	, visible(false)
 {
 
@@ -21,9 +21,15 @@ Layout::~Layout()
 
 
 
-void Layout::Enter()
+void Layout::Enter(bool withAnimation)
 {
 	visible = true;
+	y = Def::trackHeight;
+
+	if (!withAnimation)
+	{
+		y = 0;
+	}
 
 	for (auto w : widgets)
 	{
@@ -31,24 +37,49 @@ void Layout::Enter()
 	}
 }
 
-void Layout::Exit()
+void Layout::Exit(bool withAnimation)
 {
 	visible = false;
+
+	if (!withAnimation)
+	{
+		y = -Def::trackHeight;
+	}
 }
 
 
 
 void Layout::Update(int time)
 {
-	for (auto w : widgets)
+	if (visible && y > 0)
 	{
-		w->Update(time);
+		y += (-y - 10) * 0.2;
+		if (y < 1.0)
+		{
+			y = 0.0;
+		}
+	}
+	if (!visible && y > -Def::trackHeight)
+	{
+		y += (-Def::trackHeight - y - 10) * 0.2;
+		if (y - -Def::trackHeight < 1.0)
+		{
+			y = -Def::trackHeight;
+		}
+	}
+
+	if (visible)
+	{
+		for (auto w : widgets)
+		{
+			w->Update(time);
+		}
 	}
 }
 
 void Layout::Draw(QPainter* painter) const
 {
-	if (!visible)
+	if (y <= -Def::trackHeight)
 	{
 		return;
 	}
