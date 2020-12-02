@@ -27,6 +27,8 @@ namespace Def
 	
 	extern const std::string resPath;
 
+	extern const std::string profilePath;
+
 	//---------------------视觉相关------------------------//
 	
 	extern const int windowWidth;
@@ -59,6 +61,10 @@ namespace Def
 	extern const QColor btnColor;
 	extern const QColor btnHoverColor;
 	extern const QColor btnDownColor;
+	extern const QColor btnDisabledColor;
+
+	extern const QColor recordListColor;
+	extern const QColor recordListHighlightColor;
 
 	//---------------------游戏内容相关--------------------//
 

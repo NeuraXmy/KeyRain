@@ -23,6 +23,9 @@ public:
 	//启动应用程序
 	void Start();
 
+	//结束应用程序
+	void Exit();
+
 private:
 
 	Application();

@@ -13,7 +13,15 @@ Widget::Widget() :
 	w(0),
 	h(0),
 	visible(true),
+	inCurrentLayout(false),
 	anchor(Anchor::LeftBottom)
+{
+
+}
+
+
+
+void Widget::Reset()
 {
 
 }

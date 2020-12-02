@@ -21,7 +21,9 @@ namespace Def
 
 	const int uiTick = 20;
 
-	const std::string resPath = "./res/";
+	const std::string resPath = "./resources/";
+
+	const std::string profilePath = "./profiles/";
 
 	//---------------------视觉相关------------------------//
 
@@ -81,6 +83,10 @@ namespace Def
 	const QColor btnColor = Qt::green;
 	const QColor btnHoverColor = Qt::yellow;
 	const QColor btnDownColor = Qt::white;
+	const QColor btnDisabledColor = QColor(20, 100, 20);
+
+	const QColor recordListColor = Qt::green;
+	const QColor recordListHighlightColor = Qt::yellow;
 
 	//---------------------游戏内容相关--------------------//
 
@@ -100,7 +106,7 @@ namespace Def
 	const int feverTime = 8000;
 	const double feverProcessSpeedUp = 5;
 
-	const double diffIncreaseSpeed = 0.001;
+	const double diffIncreaseSpeed = 0.0012;
 	const double noteSpeedStart = 300.0;
 	const double noteSpeedEnd = 1000.0;
 	const double noteSlowDownStart = 0.95;

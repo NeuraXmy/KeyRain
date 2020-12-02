@@ -27,18 +27,13 @@ void Layout::Enter()
 
 	for (auto w : widgets)
 	{
-		w->blockSignals(false);
+		w->Reset();
 	}
 }
 
 void Layout::Exit()
 {
 	visible = false;
-
-	for (auto w : widgets)
-	{
-		w->blockSignals(true);
-	}
 }
 
 

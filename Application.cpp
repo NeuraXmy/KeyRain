@@ -99,7 +99,9 @@ void Application::Start()
 
 	//³õÊ¼»¯ui
 	Ui::Init();
-	UiManager::GetInstance()->Enter(&Ui::gameLayout);
+}
 
-	GameManager::GetInstance()->OnStart("cppkeywords");
+void Application::Exit()
+{
+	ReleaseInstance();
 }

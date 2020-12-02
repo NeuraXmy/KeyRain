@@ -32,10 +32,14 @@ public:
 	Button(const std::string& str = "", int hotkey = 0);
 
 
+	void Reset() override;
 
 	void Draw(QPainter* painter) const override;
 
 
+
+	//设置按钮是否无效
+	void SetDisable(bool flag);
 
 	void OnKeyPressEvent(int key) override;
 
@@ -59,5 +63,8 @@ private:
 	bool isHover;
 
 	bool hotkeyPressed;
+
+	//是否无效
+	bool disabled;
 
 };

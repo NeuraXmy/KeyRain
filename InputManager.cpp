@@ -1,7 +1,10 @@
 //InputManager.cpp: 输入管理器类型
 
 #include "InputManager.h"
+#include "DrawManager.h"
 #include "Define.h"
+
+#include <qdebug.h>
 
 namespace
 {
@@ -53,7 +56,8 @@ void InputManager::timerEvent(QTimerEvent* event)
 
 void InputManager::mouseMoveEvent(QMouseEvent* event)
 {
-	emit MouseMoveSignal(event->pos().x(), event->pos().y());
+	QPoint pos = DrawManager::GetInstance()->mapFromGlobal(event->globalPos());
+	emit MouseMoveSignal(pos.x(), pos.y());
 }
 
 void InputManager::mousePressEvent(QMouseEvent* event)

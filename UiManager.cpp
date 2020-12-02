@@ -101,9 +101,8 @@ void UiManager::OnKeyReleaseEvent(int key)
 
 void UiManager::OnMouseMoveEvent(int mouseX, int mouseY)
 {
-	qDebug() << mouseX - Def::trackPosX << (Def::windowHeight - mouseY) - (Def::windowHeight - Def::trackPosY - Def::trackHeight);
 	layouts.back()->OnMouseMoveEvent(mouseX - Def::trackPosX, 
-		(Def::windowHeight - mouseY) - (Def::windowHeight - Def::trackPosY - Def::trackHeight));
+		(Def::windowHeight - mouseY) - Def::trackPosY);
 }
 
 void UiManager::OnMouseLeftBtnPressEvent()

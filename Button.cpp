@@ -14,12 +14,18 @@ Button::Button(const std::string& str, int hotkey)
 	, isHover(false)
 	, hotkey(hotkey)
 	, hotkeyPressed(false)
+	, disabled(false)
 
 {
 	
 }
 
 
+
+void Button::Reset()
+{
+	isDown = isHover = hotkeyPressed = false;
+}
 
 void Button::Draw(QPainter* painter) const
 {
@@ -34,12 +40,20 @@ void Button::Draw(QPainter* painter) const
 		painter->translate(x - w / 2, y - h / 2);
 
 	painter->setBrush(Qt::transparent);
-	if (isDown)
+	if(disabled)
+		painter->setPen(Def::btnDisabledColor);
+	else if (isDown)
 		painter->setPen(Def::btnDownColor);
 	else if (isHover)
 		painter->setPen(Def::btnHoverColor);
 	else
 		painter->setPen(Def::btnColor);
+
+	auto pen = painter->pen();
+	auto lastPen = pen;
+	pen.setWidth(2);
+	painter->setPen(pen);
+
 	painter->drawRect(0, 0, w, h);
 
 	{
@@ -60,6 +74,8 @@ void Button::Draw(QPainter* painter) const
 		painter->translate(-x, -y);
 	else if (anchor == Anchor::Center)
 		painter->translate(w / 2 - x, h / 2 - y);
+
+	painter->setPen(lastPen);
 }
 
 
@@ -71,7 +87,7 @@ void Button::OnMouseMoveEvent(int mouseX, int mouseY)
 
 void Button::OnMouseLeftBtnPressEvent()
 {
-	if (!isHover)
+	if (disabled || !isHover)
 	{
 		return;
 	}
@@ -84,6 +100,11 @@ void Button::OnMouseLeftBtnPressEvent()
 
 void Button::OnMouseLeftBtnReleaseEvent()
 {
+	if (disabled)
+	{
+		return;
+	}
+
 	if (isDown)
 	{
 		isDown = false;
@@ -96,8 +117,24 @@ void Button::OnMouseLeftBtnReleaseEvent()
 	}
 }
 
+void Button::SetDisable(bool flag)
+{
+	if (disabled == flag)
+	{
+		return;
+	}
+
+	disabled = flag;
+	isHover = isDown = hotkeyPressed = false;
+}
+
 void Button::OnKeyPressEvent(int key)
 {
+	if (disabled)
+	{
+		return;
+	}
+
 	if (key == hotkey && !isDown && !hotkeyPressed)
 	{
 		hotkeyPressed = true;
@@ -110,6 +147,11 @@ void Button::OnKeyPressEvent(int key)
 
 void Button::OnKeyReleaseEvent(int key)
 {
+	if (disabled)
+	{
+		return;
+	}
+
 	if (key == hotkey && isDown &&  hotkeyPressed)
 	{
 		hotkeyPressed = false;

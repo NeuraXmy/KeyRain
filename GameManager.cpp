@@ -224,20 +224,22 @@ bool GameManager::LoadLevel(const std::string& name)
 
 
 
-void GameManager::OnStart(const std::string& name)
+bool GameManager::OnStart(const std::string& name)
 {
 	ResetAll();
 
 	if (!LoadLevel(name))
 	{
 		qDebug() << "[ERR] Failed to start game";
-		return;
+		return false;
 	}
 
 	InitNotes();
 
 	stat = GameStat::running;
 	qDebug() << "[INFO] Game started";
+
+	return true;
 }
 
 void GameManager::OnPause()
@@ -250,6 +252,11 @@ void GameManager::OnResume()
 {
 	stat = GameStat::running;
 	qDebug() << "[INFO] Game continued";
+}
+
+void GameManager::OnExit()
+{
+	ResetAll();
 }
 
 void GameManager::OnKeyPressEvent(int key)
@@ -566,8 +573,7 @@ void GameManager::Update()
 						&& combo > nextBonusCombo 
 						&& Def::RandInt(1, 5) == 1)
 					{
-						//note->bonus = Def::RandInt(1, BonusMode::bonusNum - 1);
-						note->bonus = BonusMode::fast;
+						note->bonus = Def::RandInt(1, BonusMode::bonusNum - 1);
 						nextBonusCombo = combo + Def::bonusCombo;
 					}
 
@@ -740,7 +746,8 @@ void GameManager::Update()
 
 		if (health == 0)
 		{
-			emit GameOverSignal();
+			ResetAll();
+			emit GameOverSignal(GameRecord{ score, levelName, QDateTime::currentDateTime().toString().toStdString() });
 		}
 
 		//----------------------------------更新粒子管理器-----------------------------------//

@@ -38,11 +38,15 @@ public:
 
 	bool visible;
 
+	//是否在当前的界面
+	bool inCurrentLayout;
+
 
 
 	Widget();
 
 
+	virtual void Reset();
 
 	virtual void Update(int time);
 

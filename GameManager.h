@@ -36,6 +36,18 @@ enum FeverMode
 
 
 /**
+* GameRecord
+* 一次游戏结束的信息
+*/
+struct GameRecord
+{
+	int score;
+	std::string levelName;
+	std::string time;
+};
+
+
+/**
 * GameManager (QWidget)
 * 控制游戏进程的控制器单例类型
 */
@@ -62,8 +74,8 @@ public:
 
 
 
-	//开始词库为name的一轮游戏
-	void OnStart(const std::string& name);
+	//开始词库为name的一轮游戏 返回词库是否加载成功
+	bool OnStart(const std::string& name);
 
 	//游戏暂停
 	void OnPause();
@@ -71,15 +83,16 @@ public:
 	//游戏继续
 	void OnResume();
 
+	//游戏结束
+	void OnExit();
+
 	void OnKeyPressEvent(int key);
 
 	void OnKeyReleaseEvent(int key);
 
 signals:
 
-	void GameExitSignal();
-
-	void GameOverSignal();
+	void GameOverSignal(GameRecord record);
 
 protected:
 
