@@ -44,7 +44,7 @@ public:
 
 	void Update(int time);
 
-	void Show(QPainter* painter);
+	void Draw(QPainter* painter) const;
 
 private:
 

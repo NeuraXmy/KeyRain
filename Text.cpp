@@ -1,6 +1,10 @@
+//Text.cpp: 文本控件类型
+
 #include "Text.h"
 
 #include <qpainter.h>
+
+
 
 Text::Text(const std::string& str, int fontSize, const QColor color)
 	: Widget()
@@ -11,12 +15,10 @@ Text::Text(const std::string& str, int fontSize, const QColor color)
 
 }
 
-void Text::Update(int time)
-{
 
-}
 
-void Text::Show(QPainter* painter) const
+
+void Text::Draw(QPainter* painter) const
 {
 	if (!visible)
 	{
@@ -46,4 +48,11 @@ void Text::Show(QPainter* painter) const
 		painter->translate(-x, -y);
 	else if (anchor == Anchor::Center)
 		painter->translate(fontW / 2 - x, fontH / 2 - y);
+}
+
+
+
+void Text::SetStr(const std::string str)
+{
+	this->str = str;
 }

@@ -43,5 +43,5 @@ struct Particle
 		Vec2 v   = std::make_pair(0.0, 0.0)
 	);
 
-	void Show(QPainter* painter) const;
+	void Draw(QPainter* painter) const;
 };

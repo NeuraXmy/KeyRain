@@ -27,7 +27,7 @@ Particle::Particle(
 
 }
 
-void Particle::Show(QPainter* painter) const
+void Particle::Draw(QPainter* painter) const
 {
 	if (!visible)
 	{

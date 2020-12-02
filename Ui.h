@@ -1,9 +1,10 @@
+//Ui.h ui的初始化
+
 #pragma once
 
 class Layout;
-class UiManager;
-class GameManager;
-class Button;
+
+
 
 namespace Ui
 {
@@ -11,5 +12,6 @@ namespace Ui
 	extern Layout gameLayout;
 	extern Layout pauseLayout;
 
-	void Init(GameManager* game, UiManager* mgr);
+	//初始化ui
+	void Init();
 }

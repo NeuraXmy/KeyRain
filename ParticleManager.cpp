@@ -83,12 +83,16 @@ void ParticleManager::Update(int time)
 	}
 }
 
-void ParticleManager::Show(QPainter* painter)
+void ParticleManager::Draw(QPainter* painter) const
 {
+	painter->translate(Def::trackPosX, Def::trackPosY);
+
 	for (auto& p : particles)
 	{
-		p.Show(painter);
+		p.Draw(painter);
 	}
+
+	painter->translate(-Def::trackPosX, -Def::trackPosY);
 }
 
 

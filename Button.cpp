@@ -1,12 +1,14 @@
+//Button.h: 按钮控件类型
+
 #include "Button.h"
 #include "Define.h"
-#include "UiManager.h"
 
 #include <qpainter.h>
 
-Button::Button(UiManager* mgr, const std::string& str, int hotkey)
+
+
+Button::Button(const std::string& str, int hotkey)
 	: Widget()
-	, mgr(mgr)
 	, str(str)
 	, isDown(false)
 	, isHover(false)
@@ -14,70 +16,12 @@ Button::Button(UiManager* mgr, const std::string& str, int hotkey)
 	, hotkeyPressed(false)
 
 {
-	connect(mgr, &UiManager::MouseMoveSignal, this, &Button::OnMouseMove);
-	connect(mgr, &UiManager::MouseLeftPressSignal, this, &Button::OnMouseLeftPress);
-	connect(mgr, &UiManager::MouseLeftReleaseSignal, this, &Button::OnMouseLeftRelease);
-	connect(mgr, &UiManager::KeyPressSignal, this, &Button::OnKeyPress);
-	connect(mgr, &UiManager::KeyReleaseSignal, this, &Button::OnKeyRelease);
-}
-
-void Button::Update(int time)
-{
-
-}
-
-void Button::OnMouseMove(int mouseX, int mouseY)
-{
-	isHover = isMouseHover(mouseX, mouseY);
-}
-
-void Button::OnMouseLeftPress()
-{
-	if (!isHover)
-	{
-		return;
-	}
-
-	if (!isDown)
-	{
-		isDown = true;
-	}
-}
-
-void Button::OnMouseLeftRelease()
-{
-	if (isDown)
-	{
-		isDown = false;
-		if (isHover)
-		{
-			emit ClickSignal();
-		}
-	}
-}
-
-void Button::OnKeyPress(int key)
-{
-	if (key == hotkey && !isDown && !hotkeyPressed)
-	{
-		hotkeyPressed = true;
-		isDown = true;
-
-		emit ClickSignal();
-	}
-}
-
-void Button::OnKeyRelease(int key)
-{
-	if (key == hotkey && isDown &&  hotkeyPressed)
-	{
-		hotkeyPressed = false;
-		isDown = false;
-	}
+	
 }
 
 
-void Button::Show(QPainter* painter) const
+
+void Button::Draw(QPainter* painter) const
 {
 	if (!visible)
 	{
@@ -115,5 +59,62 @@ void Button::Show(QPainter* painter) const
 	if (anchor == Anchor::LeftBottom)
 		painter->translate(-x, -y);
 	else if (anchor == Anchor::Center)
-		painter->translate(w/ 2 - x, h / 2 - y);
+		painter->translate(w / 2 - x, h / 2 - y);
 }
+
+
+
+void Button::OnMouseMoveEvent(int mouseX, int mouseY)
+{
+	isHover = isMouseHover(mouseX, mouseY);
+}
+
+void Button::OnMouseLeftBtnPressEvent()
+{
+	if (!isHover)
+	{
+		return;
+	}
+
+	if (!isDown)
+	{
+		isDown = true;
+	}
+}
+
+void Button::OnMouseLeftBtnReleaseEvent()
+{
+	if (isDown)
+	{
+		isDown = false;
+		//鼠标放开时在按钮上就判断按钮正常按下
+		//不在按钮上则不判断按下
+		if (isHover)
+		{
+			emit ClickSignal();
+		}
+	}
+}
+
+void Button::OnKeyPressEvent(int key)
+{
+	if (key == hotkey && !isDown && !hotkeyPressed)
+	{
+		hotkeyPressed = true;
+		isDown = true;
+
+		//快捷键按下时即马上判断按钮按下
+		emit ClickSignal();
+	}
+}
+
+void Button::OnKeyReleaseEvent(int key)
+{
+	if (key == hotkey && isDown &&  hotkeyPressed)
+	{
+		hotkeyPressed = false;
+		isDown = false;
+	}
+}
+
+

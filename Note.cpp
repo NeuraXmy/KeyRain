@@ -21,7 +21,7 @@ Note::Note(char ch, double x, double y, bool wordBegin)
 
 }
 
-void Note::Show(QPainter* painter, bool is1st, bool fever) const
+void Note::Draw(QPainter* painter, bool is1st, bool fever) const
 {
 	if (stat != NoteStat::visible)
 	{

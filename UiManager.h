@@ -1,3 +1,5 @@
+//UiManager.h： ui管理器类型
+
 #pragma once
 
 #include <qwidget.h>
@@ -7,55 +9,65 @@
 class Layout;
 class GameManager;
 
+
+
+/**
+* UiManager (QWidget)
+* 管理ui的单例类型
+*/
 class UiManager : public QWidget
 {
 	Q_OBJECT
 
 public:
 
-	UiManager(GameManager* game, QWidget* parent = nullptr);
+	static UiManager* GetInstance();
+
+	static void ReleaseInstance();
+
+
+
+	UiManager();
 
 	~UiManager();
 
+
+
+	//进入界面
 	void Enter(Layout* layout);
 
+	//返回上一个界面
 	void Back();
 
-	void Show(QPainter* painter) const;
 
-	void AddLayout(Layout* layout);
 
-signals:
+	//绘制
+	void Draw(QPainter* painter) const;
 
-	void MouseMoveSignal(int mouseX, int mouseY);
+	//将layout添加到绘制列表
+	void AddDrawList(Layout* layout);
 
-	void MouseLeftPressSignal();
 
-	void MouseLeftReleaseSignal();
 
-	void KeyPressSignal(int key);
+	void OnKeyPressEvent(int key);
 
-	void KeyReleaseSignal(int key);
+	void OnKeyReleaseEvent(int key);
+
+	void OnMouseMoveEvent(int mouseX, int mouseY);
+
+	void OnMouseLeftBtnPressEvent();
+
+	void OnMouseLeftBtnReleaseEvent();
 
 protected:
 
 	void timerEvent(QTimerEvent* event) override;
 
-	void mousePressEvent(QMouseEvent* event) override;
-
-	void mouseReleaseEvent(QMouseEvent* event) override;
-
-	void mouseMoveEvent(QMouseEvent* event) override;
-
-	void keyPressEvent(QKeyEvent* event) override;
-
-	void keyReleaseEvent(QKeyEvent* event) override;
-
 private:
 
 	std::list<Layout*> layouts;
 
-	std::list<Layout*> allLayouts;
+	std::list<Layout*> drawList;
 
 	int time;
 

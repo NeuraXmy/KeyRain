@@ -57,5 +57,6 @@ struct Note
 	Note(char ch, double x, double y, bool wordBegin);
 
 	//绘制字符，is1st：字符是否是目前的第一个 fever：目前是否在fever模式
-	void Show(QPainter* painter, bool is1st, bool fever) const;
+	void Draw(QPainter* painter, bool is1st, bool fever) const;
+
 };

@@ -11,6 +11,7 @@
 
 class QTime;
 class QImage;
+class QPainter;
 
 class Note;
 
@@ -48,15 +49,21 @@ public:
 
 	static void ReleaseInstance();
 
+	
+	//绘制轨道
+	void DrawTrack(QPainter* painter) const;
 
+	//绘制游戏界面
+	void DrawGui(QPainter* painter) const;
 
-	//开始词库为name的一轮游戏
-	void Start(const std::string& name);
 
 	//获取游戏状态
 	int GetStat() const;
 
 
+
+	//开始词库为name的一轮游戏
+	void OnStart(const std::string& name);
 
 	//游戏暂停
 	void OnPause();
@@ -77,8 +84,6 @@ signals:
 protected:
 
 	void timerEvent(QTimerEvent* event) override;
-
-	void paintEvent(QPaintEvent* event) override;
 
 private:
 
@@ -103,7 +108,7 @@ private:
 	std::list<int> keys;
 
 	//某个键是否按下
-	std::map<int, bool> keyHolding;
+	mutable std::map<int, bool> keyHolding;
 
 	int stat;
 
@@ -136,7 +141,7 @@ private:
 	//------------------------------------视觉相关-------------------------------------//
 
 	//键盘按键发光颜色
-	std::map<int, QColor> keyColor;
+	mutable std::map<int, QColor> keyColor;
 	//轨道底部闪光颜色
 	QColor bottomLightColor;
 	//轨道底部闪光渐变高度

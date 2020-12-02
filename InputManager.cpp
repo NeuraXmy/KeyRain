@@ -28,6 +28,10 @@ InputManager::InputManager()
 	: QWidget()
 {
 	timerId = QWidget::startTimer(Def::inputTickTime, Qt::PreciseTimer);
+
+	this->setMouseTracking(true);
+
+	this->hide();
 }
 
 InputManager::~InputManager()

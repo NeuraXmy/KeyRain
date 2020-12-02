@@ -1,3 +1,5 @@
+//Ui.cpp ui的初始化
+
 #include "Ui.h"
 #include "UiManager.h"
 #include "GameManager.h"
@@ -15,49 +17,62 @@ namespace Ui
 	Layout gameLayout;
 	Layout pauseLayout;
 
-	UiManager* mgr;
-	GameManager* game;
 
+
+	//槽行为
 	namespace Action
 	{
+		//ui回退
 		void Back()
 		{
-			mgr->Back();
+			UiManager::GetInstance()->Back();
 		}
-		void JumpToPauseLayout()
+		//跳转到暂停界面
+		void EnterPauseLayout()
 		{
-			mgr->Enter(&pauseLayout);
+			UiManager::GetInstance()->Enter(&pauseLayout);
+		}
+		//游戏暂停
+		void GamePause()
+		{
+			GameManager::GetInstance()->OnPause();
+		}
+		//游戏继续
+		void GameResume()
+		{
+			GameManager::GetInstance()->OnResume();
 		}
 	}
 
-	void Init(GameManager* game, UiManager* mgr)
-	{
-		Ui::mgr = mgr;
-		Ui::game = game;
 
-		Text* text = new Text("PAUSED", 50, Qt::green);
+
+	void Init()
+	{
+		Text* text = new Text("PAUSED", 40, Qt::green);
 		text->x = Def::trackWidth / 2, text->y = Def::trackHeight / 2 + 50;
 		text->anchor = Anchor::Center;
 
-		Button* resumeBtn = new Button(mgr, "RESUME", Qt::Key::Key_Escape);
+		Button* resumeBtn = new Button("RESUME", Qt::Key::Key_Escape);
 		resumeBtn->x = Def::trackWidth / 2, resumeBtn->y = Def::trackHeight / 2 - 20;
-		resumeBtn->w = 200, resumeBtn->h = 40;
+		resumeBtn->w = 160, resumeBtn->h = 40;
 		resumeBtn->anchor = Anchor::Center;
 		QObject::connect(resumeBtn, &Button::ClickSignal, &Action::Back);
+		QObject::connect(resumeBtn, &Button::ClickSignal, &Action::GameResume);
 
 		pauseLayout.AddWidget(text);
 		pauseLayout.AddWidget(resumeBtn);
 
 
-		Button* pauseBtn = new Button(mgr, "PAUSE", Qt::Key::Key_Escape);
+		Button* pauseBtn = new Button("PAUSE", Qt::Key::Key_Escape);
 		pauseBtn->visible = false;
-		QObject::connect(pauseBtn, &Button::ClickSignal, &Action::JumpToPauseLayout);
+		QObject::connect(pauseBtn, &Button::ClickSignal, &Action::EnterPauseLayout);
+		QObject::connect(pauseBtn, &Button::ClickSignal, &Action::GamePause);
 
 		gameLayout.AddWidget(pauseBtn);
 
 
-		mgr->AddLayout(&nullLayout);
-		mgr->AddLayout(&pauseLayout);
-		mgr->AddLayout(&gameLayout);
+		UiManager::GetInstance()->AddDrawList(&nullLayout);
+		UiManager::GetInstance()->AddDrawList(&pauseLayout);
+		UiManager::GetInstance()->AddDrawList(&gameLayout);
 	}
 }

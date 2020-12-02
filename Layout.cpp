@@ -1,4 +1,5 @@
-#include "UiManager.h"
+//Layout.cpp: ½çÃæÀà
+
 #include "Layout.h"
 #include "Define.h"
 #include "Widget.h"
@@ -18,9 +19,12 @@ Layout::~Layout()
 	ClearWidget();
 }
 
+
+
 void Layout::Enter()
 {
 	visible = true;
+
 	for (auto w : widgets)
 	{
 		w->blockSignals(false);
@@ -30,11 +34,14 @@ void Layout::Enter()
 void Layout::Exit()
 {
 	visible = false;
+
 	for (auto w : widgets)
 	{
 		w->blockSignals(true);
 	}
 }
+
+
 
 void Layout::Update(int time)
 {
@@ -44,7 +51,7 @@ void Layout::Update(int time)
 	}
 }
 
-void Layout::Show(QPainter* painter) const
+void Layout::Draw(QPainter* painter) const
 {
 	if (!visible)
 	{
@@ -54,10 +61,12 @@ void Layout::Show(QPainter* painter) const
 	painter->translate(x, y);
 	for (auto w : widgets)
 	{
-		w->Show(painter);
+		w->Draw(painter);
 	}
 	painter->translate(-x, -y);
 }
+
+
 
 void Layout::AddWidget(Widget* w)
 {
@@ -71,4 +80,46 @@ void Layout::ClearWidget()
 		delete w;
 	}
 	widgets.clear();
+}
+
+
+
+void Layout::OnKeyPressEvent(int key)
+{
+	for (auto w : widgets)
+	{
+		w->OnKeyPressEvent(key);
+	}
+}
+
+void Layout::OnKeyReleaseEvent(int key)
+{
+	for (auto w : widgets)
+	{
+		w->OnKeyReleaseEvent(key);
+	}
+}
+
+void Layout::OnMouseMoveEvent(int mouseX, int mouseY)
+{
+	for (auto w : widgets)
+	{
+		w->OnMouseMoveEvent(mouseX - x, mouseY - y);
+	}
+}
+
+void Layout::OnMouseLeftBtnPressEvent()
+{
+	for (auto w : widgets)
+	{
+		w->OnMouseLeftBtnPressEvent();
+	}
+}
+
+void Layout::OnMouseLeftBtnReleaseEvent()
+{
+	for (auto w : widgets)
+	{
+		w->OnMouseLeftBtnReleaseEvent();
+	}
 }

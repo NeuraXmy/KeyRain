@@ -1,15 +1,26 @@
+//Widget.h: 控件类型
+
 #pragma once
 
 #include <qobject.h>
 
+class QPainter;
+
+
+
+//控件的锚定位置
 enum Anchor
 {
 	Center,
 	LeftBottom
 };
 
-class QPainter;
 
+
+/**
+* Widget (QObject)
+* 代表ui中的控件的抽象接口类型
+*/
 class Widget : public QObject
 {
 	Q_OBJECT
@@ -18,19 +29,40 @@ public:
 
 	int x;
 	int y;
+
 	int w;
 	int h;
 
+	//锚定位置(默认为左下)
 	int anchor;
 
 	bool visible;
 
+
+
 	Widget();
+
+
 
 	virtual void Update(int time);
 
-	virtual void Show(QPainter* painter) const;
+	virtual void Draw(QPainter* painter) const;
 
+
+
+	virtual void OnKeyPressEvent(int key);
+
+	virtual void OnKeyReleaseEvent(int key);
+
+	virtual void OnMouseMoveEvent(int mouseX, int mouseY);
+
+	virtual void OnMouseLeftBtnPressEvent();
+
+	virtual void OnMouseLeftBtnReleaseEvent();
+
+protected:
+	
+	//检测鼠标是否在控件上
 	bool isMouseHover(int mouseX, int mouseY) const;
 
 };

@@ -85,7 +85,7 @@ void GameManager::ReleaseInstance()
 GameManager::GameManager()
 	: QWidget()
 {
-	this->resize(Def::windowWidth, Def::windowHeight);
+	this->hide();
 
 	timerId = QObject::startTimer(1, Qt::TimerType::PreciseTimer);
 	
@@ -107,6 +107,13 @@ GameManager::~GameManager()
 	delete interfaceImage;
 	delete keyImage;
 	delete keyDownImage;
+}
+
+
+
+int GameManager::GetStat() const
+{
+	return stat;
 }
 
 
@@ -215,7 +222,9 @@ bool GameManager::LoadLevel(const std::string& name)
 	return true;
 }
 
-void GameManager::Start(const std::string& name)
+
+
+void GameManager::OnStart(const std::string& name)
 {
 	ResetAll();
 
@@ -243,11 +252,6 @@ void GameManager::OnResume()
 	qDebug() << "[INFO] Game continued";
 }
 
-int GameManager::GetStat() const
-{
-	return stat;
-}
-
 void GameManager::OnKeyPressEvent(int key)
 {
 	if (!keyHolding[key])
@@ -272,21 +276,14 @@ void GameManager::timerEvent(QTimerEvent* event)
 	}
 
 	static int updateTime	= 0;
-	static int showTime		= 0;
 	
 	while (updateTime >= Def::tickTime) 
 	{
 		updateTime -= Def::tickTime;
 		Update();
 	}
-	while (showTime >= Def::frameTime)
-	{
-		showTime -= Def::frameTime;
-		this->update();
-	}
 
 	updateTime	+= clock->elapsed();
-	showTime	+= clock->elapsed();
 	clock->start();
 }
 
@@ -302,31 +299,29 @@ void GameManager::Update()
 
 		//-----------------------------------更新游戏进程----------------------------------//
 
-		{
-			double process = std::min(1.0,
-				std::atan(
-					sqrt(
-						noteCount
-						* (feverMode == FeverMode::fever ? Def::feverProcessSpeedUp : 1.0)
-						* Def::diffIncreaseSpeed
-						* (1.0 + fever / Def::maxFever * (Def::noteProcessFeverEffect - 1.0)) + 1.0)
-					- 1.0
-				)
-				/ Def::pi * 2.0);
-		}
+		double process = std::min(1.0,
+			std::atan(
+				sqrt(
+					noteCount
+					* (feverMode == FeverMode::fever ? Def::feverProcessSpeedUp : 1.0)
+					* Def::diffIncreaseSpeed
+					* (1.0 + fever / Def::maxFever * (Def::noteProcessFeverEffect - 1.0)) + 1.0)
+				- 1.0
+			)
+			/ Def::pi * 2.0);
 
 		//---------------更新当前字符下落的速度，下落减速系数，下落间隔----------------------//
 
 		{
-			noteSpeed = (1.0 - process) * Def::noteSpeedStart + process * Def::noteSpeedEnd;
-			noteSlowDown = (1.0 - process) * Def::noteSlowDownStart + process * Def::noteSlowDownEnd;
-			noteInterval = (1.0 - process) * Def::noteIntervalStart + process * Def::noteIntervalEnd
-				- (feverMode == FeverMode::fever ? 0.05 : 0.0);
+			noteSpeed		= (1.0 - process) * Def::noteSpeedStart		+ process * Def::noteSpeedEnd;
+			noteSlowDown	= (1.0 - process) * Def::noteSlowDownStart	+ process * Def::noteSlowDownEnd;
+			noteInterval	= (1.0 - process) * Def::noteIntervalStart	+ process * Def::noteIntervalEnd
+							   - (feverMode == FeverMode::fever ? 0.05 : 0.0);
 			//计算奖励模式的贡献
 			if (bonusMode == BonusMode::fast)
 			{
-				noteSpeed *= 1.5;
-				noteInterval *= 0.9;
+				noteSpeed *= 1.3;
+				noteInterval *= 0.85;
 			}
 			else if (bonusMode == BonusMode::slow)
 			{
@@ -548,7 +543,7 @@ void GameManager::Update()
 			//实际的note间隔
 			int interval = noteInterval * noteSpeed;
 
-			double lastNoteY = -100 * Def::trackHeight;
+			double lastNoteY = -100.0 * Def::trackHeight;
 			double lastNoteX = Def::noteTrackWidth / 2;
 
 			for (auto note : notes)
@@ -565,11 +560,14 @@ void GameManager::Update()
 				{
 					note->stat = NoteStat::visible;
 
-					//根据连击数附加给note奖励
-					if (bonusMode == BonusMode::noBonus && feverMode == FeverMode::notFever
-						&& combo > nextBonusCombo && Def::RandInt(1, 5) == 1)
+					//根据连击数给note附加奖励
+					if (bonusMode == BonusMode::noBonus 
+						&& feverMode == FeverMode::notFever
+						&& combo > nextBonusCombo 
+						&& Def::RandInt(1, 5) == 1)
 					{
-						note->bonus = Def::RandInt(1, BonusMode::bonusNum - 1);
+						//note->bonus = Def::RandInt(1, BonusMode::bonusNum - 1);
+						note->bonus = BonusMode::fast;
 						nextBonusCombo = combo + Def::bonusCombo;
 					}
 
@@ -754,159 +752,152 @@ void GameManager::Update()
 
 
 
-void GameManager::paintEvent(QPaintEvent* event)
+void GameManager::DrawTrack(QPainter* painter) const
 {
-	QPainter painter(this);
-	painter.scale(1.0, -1.0);
-	painter.translate(0, -Def::windowHeight);
+	painter->setPen(Qt::black);
 
-	//draw track
+	double shakeX = std::sin(time) * trackShake;
+	double shakeY = std::cos(time) * trackShake;
+
+	painter->translate(Def::trackPosX + shakeX, Def::trackPosY + shakeY);
+
+	//draw background
+	QLinearGradient grad(QPointF(0, -Def::trackHeight), QPointF(0, Def::trackHeight));
+	grad.setColorAt(0.3, bottomLightColor);
+	grad.setColorAt(bottomLightHeight, Qt::black);
+	painter->setBrush(QBrush(grad));
+	painter->drawRect(QRect(-2, -2, Def::trackWidth + 4, Def::trackHeight + 4));
+
+	if (stat == GameStat::running)
 	{
-		painter.setPen(Qt::black);
-
-		double shakeX = std::sin(time) * trackShake;
-		double shakeY = std::cos(time) * trackShake;
-
-		painter.translate(Def::trackPosX + shakeX, Def::trackPosY + shakeY);
-
-		//draw background
-		QLinearGradient grad(QPointF(0, -Def::trackHeight), QPointF(0, Def::trackHeight));
-		grad.setColorAt(0.3, bottomLightColor);
-		grad.setColorAt(bottomLightHeight, Qt::black);
-		painter.setBrush(QBrush(grad));
-		painter.drawRect(QRect(-2, -2, Def::trackWidth + 4, Def::trackHeight + 4));
-
-		if (stat == GameStat::running)
+		//draw fever text
+		if (feverMode == FeverMode::standby)
 		{
-			//draw fever text
-			if (feverMode == FeverMode::standby)
+			auto font = painter->font();
+			font.setPixelSize(40);
+			painter->setFont(font);
+			QFontMetrics m(painter->font());
+			int fontSizeX = m.width("FEVER STANDBY");
+			int fontSizeY = m.height();
+
+			painter->translate(Def::trackWidth / 2, Def::trackHeight / 2);
+
+			QColor color = Lerp(feverBarColor, Qt::black, 0.5);
+			painter->setPen(color);
+
+			painter->scale(1.0, -1.0);
+			painter->drawText(-fontSizeX / 2, -5, "FEVER STANDBY");
+			painter->scale(1.0, -1.0);
+
+			int sec = (Def::feverStandByTime - time + feverStartTime) / 1000 + 1;
+
+			font = painter->font();
+			font.setPixelSize(70);
+			painter->setFont(font);
+			m = QFontMetrics(painter->font());
+
+			if ((time / (20 + sec * 20)) & 1)
 			{
-				auto font = painter.font();
-				font.setPixelSize(40);
-				painter.setFont(font);
-				QFontMetrics m(painter.font());
-				int fontSizeX = m.width("FEVER STANDBY");
-				int fontSizeY = m.height();
-
-				painter.translate(Def::trackWidth / 2, Def::trackHeight / 2);
-
-				QColor color = Lerp(feverBarColor, Qt::black, 0.5);
-				painter.setPen(color);
-
-				painter.scale(1.0, -1.0);
-				painter.drawText(-fontSizeX / 2, -5, "FEVER STANDBY");
-				painter.scale(1.0, -1.0);
-
-				int sec = (Def::feverStandByTime - time + feverStartTime) / 1000 + 1;
-
-				font = painter.font();
-				font.setPixelSize(70);
-				painter.setFont(font);
-				m = QFontMetrics(painter.font());
-
-				if ((time / (20 + sec * 20)) & 1)
-				{
-					color = Lerp(color, Qt::white, 0.5);
-				}
-				fontSizeX = m.width(std::to_string(sec).c_str());
-				fontSizeY = m.height();
-
-				painter.setPen(color);
-				painter.scale(1.0, -1.0);
-				painter.drawText(-fontSizeX / 2, fontSizeY, std::to_string(sec).c_str());
-				painter.scale(1.0, -1.0);
-
-				painter.translate(-Def::trackWidth / 2, -Def::trackHeight / 2);
+				color = Lerp(color, Qt::white, 0.5);
 			}
+			fontSizeX = m.width(std::to_string(sec).c_str());
+			fontSizeY = m.height();
 
-			//draw bonus text
-			if (bonusMode != BonusMode::noBonus)
-			{
-				auto font = painter.font();
-				font.setPixelSize(50);
-				painter.setFont(font);
-				QFontMetrics m(painter.font());
-				int fontSizeX = m.width(Def::bonusTitle[bonusMode].c_str());
-				int fontSizeY = m.height();
+			painter->setPen(color);
+			painter->scale(1.0, -1.0);
+			painter->drawText(-fontSizeX / 2, fontSizeY, std::to_string(sec).c_str());
+			painter->scale(1.0, -1.0);
 
-				painter.translate(Def::trackWidth / 2, Def::trackHeight / 2);
-
-				QColor color = Lerp(Def::bonusColor[bonusMode], Qt::black, 0.5);
-				painter.setPen(color);
-
-				painter.setOpacity(std::max(0.0, ((2000.0 - (time - bonusStartTime)) / 2000.0)));
-				painter.scale(bonusMode == BonusMode::reverse ? -1.0 : 1.0, -1.0);
-				painter.drawText(-fontSizeX / 2, -fontSizeY / 2, Def::bonusTitle[bonusMode].c_str());
-				painter.scale(bonusMode == BonusMode::reverse ? -1.0 : 1.0, -1.0);
-				painter.setOpacity(1.0);
-
-				painter.translate(-Def::trackWidth / 2, -Def::trackHeight / 2);
-			}
-
-			//draw particle
-			ParticleManager::GetInstacne()->Show(&painter);
-
-			QFont font = painter.font();
-			font.setPixelSize(Def::noteSize);
-			font.setBold(false);
-			painter.setFont(font);
-
-			//draw note
-			bool first = true;
-			for (auto note : notes)
-			{
-				if (note->stat == NoteStat::visible)
-				{
-					note->Show(&painter, first, feverMode == FeverMode::fever);
-					first = false;
-				}
-			}
+			painter->translate(-Def::trackWidth / 2, -Def::trackHeight / 2);
 		}
 
-		painter.translate(-Def::trackPosX - shakeX, -Def::trackPosY - shakeY);
+		//draw bonus text
+		if (bonusMode != BonusMode::noBonus)
+		{
+			auto font = painter->font();
+			font.setPixelSize(50);
+			painter->setFont(font);
+			QFontMetrics m(painter->font());
+			int fontSizeX = m.width(Def::bonusTitle[bonusMode].c_str());
+			int fontSizeY = m.height();
+
+			painter->translate(Def::trackWidth / 2, Def::trackHeight / 2);
+
+			QColor color = Lerp(Def::bonusColor[bonusMode], Qt::black, 0.5);
+			painter->setPen(color);
+
+			painter->setOpacity(std::max(0.0, ((2000.0 - (time - bonusStartTime)) / 2000.0)));
+			painter->scale(bonusMode == BonusMode::reverse ? -1.0 : 1.0, -1.0);
+			painter->drawText(-fontSizeX / 2, -fontSizeY / 2, Def::bonusTitle[bonusMode].c_str());
+			painter->scale(bonusMode == BonusMode::reverse ? -1.0 : 1.0, -1.0);
+			painter->setOpacity(1.0);
+
+			painter->translate(-Def::trackWidth / 2, -Def::trackHeight / 2);
+		}
+
+		QFont font = painter->font();
+		font.setPixelSize(Def::noteSize);
+		font.setBold(false);
+		painter->setFont(font);
+
+		//draw note
+		bool first = true;
+		for (auto note : notes)
+		{
+			if (note->stat == NoteStat::visible)
+			{
+				note->Draw(painter, first, feverMode == FeverMode::fever);
+				first = false;
+			}
+		}
 	}
 
+	painter->translate(-Def::trackPosX - shakeX, -Def::trackPosY - shakeY);
+}
+
+void GameManager::DrawGui(QPainter* painter) const
+{
 	//draw score
 	{
 		int scoreFontSize = 25;
 		int scoreWidth = Def::trackWidth * 0.5;
 		int scoreHeight = scoreFontSize * 2 + 20;
 
-		QFont font = painter.font();
+		QFont font = painter->font();
 		font.setPixelSize(scoreFontSize);
 		font.setBold(false);
-		painter.setFont(font);
+		painter->setFont(font);
 
-		painter.translate(Def::scorePosX, Def::scorePosY);
+		painter->translate(Def::scorePosX, Def::scorePosY);
 
-		painter.setBrush(Qt::black);
-		painter.drawRect(QRect(-12, -12, scoreWidth + 4, scoreHeight + 4));
+		painter->setBrush(Qt::black);
+		painter->drawRect(QRect(-12, -12, scoreWidth + 4, scoreHeight + 4));
 
 		//combo and score
 		{
-			painter.scale(1.0, -1.0);
+			painter->scale(1.0, -1.0);
 
-			
-			painter.setPen(comboBarColor);
-			painter.drawText(0, 0, ("[COMBO]  " + std::to_string(combo)).c_str());
 
-			
-			painter.setPen(scoreBarColor);
-			painter.drawText(0, -scoreFontSize - 5, ("[SCORE]  " + std::to_string(scoreDisplaying)).c_str());
+			painter->setPen(comboBarColor);
+			painter->drawText(0, 0, ("[COMBO]  " + std::to_string(combo)).c_str());
 
-			painter.scale(1.0, -1.0);
+
+			painter->setPen(scoreBarColor);
+			painter->drawText(0, -scoreFontSize - 5, ("[SCORE]  " + std::to_string(scoreDisplaying)).c_str());
+
+			painter->scale(1.0, -1.0);
 		}
 
-		painter.setPen(Qt::black);
-		painter.setBrush(Qt::black);
-		painter.drawRect(QRect(scoreWidth - 2, -12, Def::trackWidth - scoreWidth - 10 + 4, scoreHeight + 4));
+		painter->setPen(Qt::black);
+		painter->setBrush(Qt::black);
+		painter->drawRect(QRect(scoreWidth - 2, -12, Def::trackWidth - scoreWidth - 10 + 4, scoreHeight + 4));
 
 		//hp
 		{
-			painter.scale(1.0, -1.0);
-			painter.setPen(healthBarColor);
-			painter.drawText(scoreWidth + 10, -scoreFontSize - 5, ("[HP]  " + std::to_string(health)).c_str());
-			painter.drawText(scoreWidth + 130, -scoreFontSize - 5, (" / " + std::to_string(Def::maxHealth)).c_str());
+			painter->scale(1.0, -1.0);
+			painter->setPen(healthBarColor);
+			painter->drawText(scoreWidth + 10, -scoreFontSize - 5, ("[HP]  " + std::to_string(health)).c_str());
+			painter->drawText(scoreWidth + 130, -scoreFontSize - 5, (" / " + std::to_string(Def::maxHealth)).c_str());
 		}
 
 		//fever bar
@@ -915,62 +906,62 @@ void GameManager::paintEvent(QPaintEvent* event)
 
 			QPen pen(feverBarColor);
 			pen.setWidth(3);
-			painter.setPen(pen);
-			painter.drawText(scoreWidth + 10, 0, "[FEVER] ");
+			painter->setPen(pen);
+			painter->drawText(scoreWidth + 10, 0, "[FEVER] ");
 			for (int i = 0; i < 5; i++)
 			{
-				painter.setBrush(Qt::black);
-				painter.drawRect(scoreWidth + 120 + i * 25, 0, 20, -20);
-				painter.setBrush(feverBarColor);
-				painter.drawRect(scoreWidth + 120 + i * 25, 0, 20, -20 * std::min(1.0, feverFactor * 5.0));
+				painter->setBrush(Qt::black);
+				painter->drawRect(scoreWidth + 120 + i * 25, 0, 20, -20);
+				painter->setBrush(feverBarColor);
+				painter->drawRect(scoreWidth + 120 + i * 25, 0, 20, -20 * std::min(1.0, feverFactor * 5.0));
 				feverFactor = std::max(0.0, feverFactor -= 0.2);
 			}
-			painter.setPen(Qt::black);
+			painter->setPen(Qt::black);
 		}
 
-		painter.scale(1.0, -1.0);
+		painter->scale(1.0, -1.0);
 
-		painter.translate(-Def::scorePosX, -Def::scorePosY);
+		painter->translate(-Def::scorePosX, -Def::scorePosY);
 	}
 
 	//draw interface
 	{
-		painter.scale(1.0, -1.0);
-		painter.drawImage(QPoint(0, -Def::windowHeight), *interfaceImage);
-		painter.scale(1.0, -1.0);
+		painter->scale(1.0, -1.0);
+		painter->drawImage(QPoint(0, -Def::windowHeight), *interfaceImage);
+		painter->scale(1.0, -1.0);
 	}
 
 	//draw keyboard
 	{
-		QFont font = painter.font();
+		QFont font = painter->font();
 		int fontSize = Def::keySize * 0.7;
 		font.setPixelSize(fontSize);
 		font.setBold(true);
-		painter.setFont(font);
-		painter.setPen(Qt::black);
+		painter->setFont(font);
+		painter->setPen(Qt::black);
 
 		for (char ch = 'a'; ch <= 'z'; ch++)
 		{
-			painter.translate(GetKeyPosX(ch), GetKeyPosY(ch));
+			painter->translate(GetKeyPosX(ch), GetKeyPosY(ch));
 
-			painter.scale(1.0, -1.0);
-			painter.setBrush(Qt::gray);
-			painter.drawImage(QRect(-Def::keySize / 2, -Def::keySize / 2, Def::keySize, -Def::keySize), keyHolding[Ch2QKey(ch)] ? *keyDownImage : *keyImage);
-			painter.setBrush(Qt::black);
-			painter.scale(1.0, -1.0);
+			painter->scale(1.0, -1.0);
+			painter->setBrush(Qt::gray);
+			painter->drawImage(QRect(-Def::keySize / 2, -Def::keySize / 2, Def::keySize, -Def::keySize), keyHolding[Ch2QKey(ch)] ? *keyDownImage : *keyImage);
+			painter->setBrush(Qt::black);
+			painter->scale(1.0, -1.0);
 
 			QString text(1, toupper(ch));
-			QFontMetrics m(painter.font());
+			QFontMetrics m(painter->font());
 			int fontSizeX = m.width(text);
 			int fontSizeY = m.height();
 
-			painter.scale(1.0, -1.0);
+			painter->scale(1.0, -1.0);
 			int keyDownOffset = keyHolding[Ch2QKey(ch)] ? 1 : 0;
-			painter.setPen(keyColor[ch]);
-			painter.drawText(-fontSizeX / 2 + keyDownOffset, fontSizeY / 2 - 5 + keyDownOffset, text);
-			painter.scale(1.0, -1.0);
+			painter->setPen(keyColor[ch]);
+			painter->drawText(-fontSizeX / 2 + keyDownOffset, fontSizeY / 2 - 5 + keyDownOffset, text);
+			painter->scale(1.0, -1.0);
 
-			painter.translate(-GetKeyPosX(ch), -GetKeyPosY(ch));
+			painter->translate(-GetKeyPosX(ch), -GetKeyPosY(ch));
 		}
 	}
-} 
+}

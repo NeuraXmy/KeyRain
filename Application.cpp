@@ -9,6 +9,8 @@
 #include "ParticleManager.h"
 #include "DrawManager.h"
 
+#include "Ui.h"
+
 #include <qdatetime.h>
 #include <qfontdatabase.h>
 #include <qapplication.h>
@@ -16,7 +18,7 @@
 
 namespace
 {
-	Application* instance;
+	Application* instance = nullptr;
 }
 
 Application* Application::GetInstance()
@@ -38,6 +40,8 @@ void Application::ReleaseInstance()
 Application::Application()
 	: QWidget()
 {
+	this->hide();
+
 	Def::SetRandSeed(QDateTime::currentDateTime().time().msec());
 
 	//加载字体
@@ -63,6 +67,8 @@ Application::~Application()
 	GameManager::ReleaseInstance();
 	InputManager::ReleaseInstance();
 	ParticleManager::ReleaseInstance();
+	DrawManager::ReleaseInstance();
+	UiManager::ReleaseInstance();
 }
 
 
@@ -73,10 +79,27 @@ void Application::InitSingalSlots()
 		GameManager::GetInstance(), &GameManager::OnKeyPressEvent);
 	connect(InputManager::GetInstance(), &InputManager::KeyReleaseSignal,
 		GameManager::GetInstance(), &GameManager::OnKeyReleaseEvent);
+	
+	connect(InputManager::GetInstance(), &InputManager::KeyPressSignal,
+		UiManager::GetInstance(), &UiManager::OnKeyPressEvent);
+	connect(InputManager::GetInstance(), &InputManager::KeyReleaseSignal,
+		UiManager::GetInstance(), &UiManager::OnKeyReleaseEvent);
+	connect(InputManager::GetInstance(), &InputManager::MouseMoveSignal,
+		UiManager::GetInstance(), &UiManager::OnMouseMoveEvent);
+	connect(InputManager::GetInstance(), &InputManager::MouseLeftBtnPressSignal,
+		UiManager::GetInstance(), &UiManager::OnMouseLeftBtnPressEvent);
+	connect(InputManager::GetInstance(), &InputManager::MouseLeftBtnReleaseSignal,
+		UiManager::GetInstance(), &UiManager::OnMouseLeftBtnReleaseEvent);
 }
 
 void Application::Start()
 {
-	GameManager::GetInstance()->show();
-	GameManager::GetInstance()->Start("cppkeywords");
+	//实例化绘图管理器
+	DrawManager::GetInstance();
+
+	//初始化ui
+	Ui::Init();
+	UiManager::GetInstance()->Enter(&Ui::gameLayout);
+
+	GameManager::GetInstance()->OnStart("cppkeywords");
 }
