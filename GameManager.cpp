@@ -150,6 +150,8 @@ void GameManager::ResetAll()
 
 	health = Def::maxHealth;
 
+	randomOrder = false;
+
 	fever = 0.0;
 	feverStartTime = -Def::feverTime * 2;
 	feverMode = FeverMode::notFever;
@@ -177,9 +179,12 @@ void GameManager::InitNotes()
 	notes.clear();
 
 	//对单词进行随机散布
-	for (int i = 0; i < words.size(); i++)
+	if (randomOrder)
 	{
-		std::swap(words[i], words[Def::RandInt(0, i)]);
+		for (int i = 0; i < words.size(); i++)
+		{
+			std::swap(words[i], words[Def::RandInt(0, i)]);
+		}
 	}
 
 	for (auto& word : words)
@@ -207,7 +212,8 @@ bool GameManager::LoadLevel(const std::string& name)
 	}
 
 	std::getline(in, levelName);
-	in.get();
+
+	in >> randomOrder;
 
 	while(in)
 	{

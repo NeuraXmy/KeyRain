@@ -365,8 +365,7 @@ namespace Ui
 
 			//aboutsÐÅÏ¢
 			Image* about = new Image(Def::resPath + "tex/abouts.png");
-			about->x = Def::trackWidth * 0.05, about->y = 45;
-			about->w = Def::trackWidth * 0.9, about->h = Def::trackHeight * 0.75;
+			about->w = Def::trackWidth, about->h = Def::trackHeight * 0.9;
 			about->anchor = Anchor::LeftBottom;
 
 			aboutsLayout.AddWidget(backBtn);

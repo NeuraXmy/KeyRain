@@ -2,3 +2,7 @@ x64/
 *.vcxproj
 *.filters
 *.user
+*.rc
+*.aps
+resource.h
+resource1.h

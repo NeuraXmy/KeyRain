@@ -10,6 +10,7 @@
 
 #include <qpainter.h>
 #include <qevent.h>
+#include <qicon.h>
 
 
 
@@ -38,6 +39,10 @@ DrawManager::DrawManager()
 	: QWidget()
 {
 	timerId = startTimer(Def::frameTime, Qt::PreciseTimer);
+
+	QIcon icon((Def::resPath + "icon.ico").c_str());
+
+	this->setWindowIcon(icon);
 
 	this->setFixedSize(Def::windowWidth, Def::windowHeight);
 	this->show();

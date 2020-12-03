@@ -21,9 +21,9 @@ namespace Def
 
 	const int uiTick = 20;
 
-	const std::string resPath = "./resources/";
+	const std::string resPath = "../resources/";
 
-	const std::string profilePath = "./profiles/";
+	const std::string profilePath = "../profiles/";
 
 	//--------------------- ”æıœ‡πÿ------------------------//
 
@@ -103,7 +103,7 @@ namespace Def
 	const int noteMissHealth = -50;
 
 	const double maxFever = 1000;
-	const double feverIncreaseSpeed = 30;
+	const double feverIncreaseSpeed = 35;
 	const int feverStandByTime = 3000;
 	const int feverTime = 8000;
 	const double feverProcessSpeedUp = 5;
