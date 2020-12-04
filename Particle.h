@@ -16,7 +16,7 @@ class QPainter;
 * Particle
 * 游戏中单个粒子的类型
 */
-struct Particle
+struct Particle final
 {
 	bool visible;
 

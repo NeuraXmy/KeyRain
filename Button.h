@@ -16,7 +16,7 @@ class UiManager;
 * Button (Widget)
 * 代表ui中按钮控件的类型
 */
-class Button : public Widget
+class Button final : public Widget
 {
 	Q_OBJECT
 

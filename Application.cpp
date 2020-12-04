@@ -10,6 +10,7 @@
 #include "DrawManager.h"
 
 #include "Standing.h"
+#include "Settings.h"
 #include "Ui.h"
 
 #include <qdatetime.h>
@@ -33,7 +34,10 @@ Application* Application::GetInstance()
 
 void Application::ReleaseInstance()
 {
-	delete instance;
+	if (instance)
+	{
+		delete instance;
+	}
 }
 
 
@@ -107,12 +111,15 @@ void Application::Start()
 	Ui::Init();
 
 	//加载排名
-	Standing::GetInstance()->LoadRecord();
+	Standing::GetInstance()->Load();
+
+	//加载设置
+	Settings::GetInstance()->Load();
 }
 
 void Application::Exit()
 {
-	Standing::GetInstance()->SaveRecord();
+	Standing::GetInstance()->Save();
 
 	ReleaseInstance();
 }

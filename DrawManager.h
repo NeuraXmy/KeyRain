@@ -10,7 +10,7 @@
 * DrawManager (QWidget)
 * 控制所有绘图操作的单例类型
 */
-class DrawManager : public QWidget
+class DrawManager final : public QWidget
 {
 	Q_OBJECT
 

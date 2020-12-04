@@ -44,6 +44,8 @@ public:
 
 
 	Widget();
+	
+	virtual ~Widget();
 
 
 	virtual void Reset();

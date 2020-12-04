@@ -16,7 +16,7 @@
 * Standing (QObject)
 * 存储游戏中的排名的单例类
 */
-class Standing : public QObject
+class Standing final : public QObject
 {
 	Q_OBJECT
 
@@ -29,9 +29,9 @@ public:
 
 	void AddRecord(GameRecord record);
 
-	void SaveRecord();
+	void Save();
 
-	void LoadRecord();
+	void Load();
 
 
 	std::vector<GameRecord> GetRecord() const;

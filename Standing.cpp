@@ -27,7 +27,10 @@ Standing* Standing::GetInstance()
 
 void Standing::ReleaseInstance()
 {
-	delete instance;
+	if (instance)
+	{
+		delete instance;
+	}
 }
 
 
@@ -50,9 +53,9 @@ void Standing::AddRecord(GameRecord record)
 	records.push(record);
 }
 
-void Standing::SaveRecord()
+void Standing::Save()
 {
-	std::string path = Def::profilePath + "records.rec";
+	std::string path = Def::profilePath + "records.dat";
 	std::ofstream out(path);
 
 	if (!out)
@@ -73,16 +76,18 @@ void Standing::SaveRecord()
 	}
 
 	out.close();
+
+	qDebug() << "[INF] Records saved";
 }
 
-void Standing::LoadRecord()
+void Standing::Load()
 {
 	while (records.size())
 	{
 		records.pop();
 	}
 
-	std::string path = Def::profilePath + "records.rec";
+	std::string path = Def::profilePath + "records.dat";
 	std::ifstream in(path);
 
 	if (!in)
@@ -105,6 +110,8 @@ void Standing::LoadRecord()
 	}
 
 	in.close();
+
+	qDebug() << "[INF] Records loaded";
 }
 
 std::vector<GameRecord> Standing::GetRecord() const

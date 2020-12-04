@@ -3,6 +3,7 @@
 #include "ParticleManager.h"
 #include "Particle.h"
 #include "Define.h"
+#include "Settings.h"
 
 #include <qpainter.h>
 
@@ -24,7 +25,10 @@ ParticleManager* ParticleManager::GetInstacne()
 
 void ParticleManager::ReleaseInstance()
 {
-	delete instance;
+	if (instance)
+	{
+		delete instance;
+	}
 }
 
 
@@ -48,6 +52,11 @@ void ParticleManager::Clear()
 
 void ParticleManager::Cast(int time, const Particle& p)
 {
+	if (!Settings::GetInstance()->showParticle)
+	{
+		return;
+	}
+
 	particles.push_back(p);
 	particles.back().castTime = time;
 	particles.back().visible = true;

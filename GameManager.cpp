@@ -5,6 +5,7 @@
 #include "Note.h"
 #include "Particle.h"
 #include "ParticleManager.h"
+#include "Settings.h"
 
 #include <qpainter.h>
 #include <qevent.h>
@@ -77,7 +78,10 @@ GameManager* GameManager::GetInstance()
 
 void GameManager::ReleaseInstance()
 {
-	delete instance;
+	if (instance)
+	{
+		delete instance;
+	}
 }
 
 
@@ -223,6 +227,9 @@ bool GameManager::LoadLevel(const std::string& name)
 	}
 	
 	in.close();
+
+	qDebug() << "[INF] Level loaded";
+
 	return true;
 }
 
@@ -894,7 +901,7 @@ void GameManager::DrawTrack(QPainter* painter) const
 		}
 
 		QFont font = painter->font();
-		font.setPixelSize(Def::noteSize);
+		font.setPixelSize(Def::noteSize * Settings::GetInstance()->noteScale);
 		font.setBold(false);
 		painter->setFont(font);
 

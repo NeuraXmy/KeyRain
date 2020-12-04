@@ -9,7 +9,7 @@
 * InputManager (QWidget)
 * 用于管理键盘与鼠标输入的单例类型
 */
-class InputManager : public QWidget
+class InputManager final : public QWidget
 {
 	Q_OBJECT
 

@@ -27,7 +27,10 @@ UiManager* UiManager::GetInstance()
 
 void UiManager::ReleaseInstance()
 {
-	delete instance;
+	if (instance)
+	{
+		delete instance;
+	}
 }
 
 

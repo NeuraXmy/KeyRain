@@ -15,7 +15,7 @@ class QPainter;
 * Image (Widget)
 * 代表ui中的图片控件类型
 */
-class Image : public  Widget
+class Image final : public  Widget
 {
 public:
 

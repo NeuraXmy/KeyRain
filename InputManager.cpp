@@ -22,7 +22,10 @@ InputManager* InputManager::GetInstance()
 
 void InputManager::ReleaseInstance()
 {
-	delete instance;
+	if (instance)
+	{
+		delete instance;
+	}
 }
 
 

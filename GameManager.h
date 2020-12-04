@@ -40,7 +40,7 @@ enum FeverMode
 * GameRecord
 * 一次游戏结束的信息
 */
-struct GameRecord
+struct GameRecord final
 {
 	int score;
 	std::string levelName;
@@ -60,7 +60,7 @@ struct GameRecord
 * GameManager (QWidget)
 * 控制游戏进程的控制器单例类型
 */
-class GameManager : public QWidget
+class GameManager final : public QWidget
 {
 	Q_OBJECT
 

@@ -19,6 +19,11 @@ Widget::Widget() :
 
 }
 
+Widget::~Widget()
+{
+
+}
+
 
 
 void Widget::Reset()

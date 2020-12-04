@@ -15,7 +15,7 @@ class QColor;
 * ParticleManager
 * 掌管粒子的产生更新和销毁的单例类型
 */
-class ParticleManager
+class ParticleManager final
 {
 public:
 

@@ -18,7 +18,7 @@ class Button;
 * 代表ui中的记录列表控件类型
 * 可以用以记录展示或选择
 */
-class RecordList : public  Widget
+class RecordList final : public  Widget
 {
 public:
 

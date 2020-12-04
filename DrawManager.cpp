@@ -30,7 +30,10 @@ DrawManager* DrawManager::GetInstance()
 
 void DrawManager::ReleaseInstance()
 {
-	delete instance;
+	if (instance)
+	{
+		delete instance;
+	}
 }
 
 
@@ -87,7 +90,7 @@ void DrawManager::paintEvent(QPaintEvent* event)
 
 void DrawManager::closeEvent(QCloseEvent* event)
 {
-	Standing::GetInstance()->SaveRecord();
+	Standing::GetInstance()->Save();
 	emit WindowCloseSignal();
 }
 

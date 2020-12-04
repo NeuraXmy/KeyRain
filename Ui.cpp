@@ -8,6 +8,7 @@
 #include "Layout.h"
 #include "Define.h"
 #include "Standing.h"
+#include "Settings.h"
 
 #include "Button.h"
 #include "Text.h"
@@ -28,6 +29,7 @@ namespace Ui
 	Layout selectLevelLayout;
 	Layout aboutsLayout;
 	Layout standingLayout;
+	Layout settingsLayout;
 
 	RecordList* levelList;
 	RecordList* standingRankList;
@@ -174,6 +176,26 @@ namespace Ui
 		{
 			Application::GetInstance()->Exit();
 		}
+
+		//跳转到设置界面
+		void EnterSettings()
+		{
+			UiManager::GetInstance()->Enter(&settingsLayout);
+		}
+
+		//保存设置
+		void SaveSettings()
+		{
+			Settings::GetInstance()->Save();
+			UiManager::GetInstance()->Back();
+		}
+
+		//取消设置
+		void CancelSettings()
+		{
+			Settings::GetInstance()->Load();
+			UiManager::GetInstance()->Back();
+		}
 	}
 
 
@@ -185,40 +207,48 @@ namespace Ui
 		{
 			//开始游戏按钮
 			Button* startBtn = new Button("START", Qt::Key::Key_Return);
-			startBtn->x = Def::trackWidth / 2, startBtn->y = Def::trackHeight / 2 - 10;
-			startBtn->w = 160, startBtn->h = 40;
+			startBtn->x = Def::trackWidth / 2, startBtn->y = Def::trackHeight / 2;
+			startBtn->w = 200, startBtn->h = 40;
 			startBtn->anchor = Anchor::Center;
 			QObject::connect(startBtn, &Button::ClickSignal, &Action::EnterSelectLevel);
 
 			//记录按钮
 			Button* recordBtn = new Button("RECORD");
-			recordBtn->x = Def::trackWidth / 2, recordBtn->y = Def::trackHeight / 2 - 70;
-			recordBtn->w = 160, recordBtn->h = 40;
+			recordBtn->x = Def::trackWidth / 2, recordBtn->y = Def::trackHeight / 2 - 50;
+			recordBtn->w = 180, recordBtn->h = 35;
 			recordBtn->anchor = Anchor::Center;
 			QObject::connect(recordBtn, &Button::ClickSignal, &Action::EnterStanding);
 
+			//设置按钮
+			Button* settingsBtn = new Button("SETTINGS");
+			settingsBtn->x = Def::trackWidth / 2, settingsBtn->y = Def::trackHeight / 2 - 90;
+			settingsBtn->w = 180, settingsBtn->h = 35;
+			settingsBtn->anchor = Anchor::Center;
+			QObject::connect(settingsBtn, &Button::ClickSignal, &Action::EnterSettings);
+
 			//关于按钮
 			Button* aboutBtn = new Button("ABOUT");
-			aboutBtn->x = Def::trackWidth / 2, aboutBtn->y = Def::trackHeight / 2 - 120;
-			aboutBtn->w = 160, aboutBtn->h = 40;
+			aboutBtn->x = Def::trackWidth / 2, aboutBtn->y = Def::trackHeight / 2 - 130;
+			aboutBtn->w = 180, aboutBtn->h = 35;
 			aboutBtn->anchor = Anchor::Center;
 			QObject::connect(aboutBtn, &Button::ClickSignal, &Action::EnterAbouts);
 
 			//结束按钮
 			Button* exitBtn = new Button("EXIT", Qt::Key::Key_Escape);
 			exitBtn->x = Def::trackWidth / 2, exitBtn->y = Def::trackHeight / 2 - 180;
-			exitBtn->w = 160, exitBtn->h = 40;
+			exitBtn->w = 180, exitBtn->h = 35;
 			exitBtn->anchor = Anchor::Center;
 			QObject::connect(exitBtn, &Button::ClickSignal, &Action::Exit);
 
 			//标题
 			Image* title = new Image(Def::resPath + "tex/title.png");
-			title->x = Def::trackWidth / 2, title->y = Def::trackHeight * 0.7;
-			title->w = Def::trackWidth * 0.8, title->h = 100;
+			title->x = Def::trackWidth * 0.5, title->y = Def::trackHeight * 0.7;
+			title->w = Def::trackWidth * 0.7, title->h = 100;
 			title->anchor = Anchor::Center;
 
 			mainMenuLayout.AddWidget(startBtn);
 			mainMenuLayout.AddWidget(exitBtn);
+			mainMenuLayout.AddWidget(settingsBtn);
 			mainMenuLayout.AddWidget(recordBtn);
 			mainMenuLayout.AddWidget(aboutBtn);
 			mainMenuLayout.AddWidget(title);
@@ -435,6 +465,33 @@ namespace Ui
 			standingLayout.AddWidget(backBtn);
 		}
 
+		//-----------------------------------设置界面-----------------------------------//
+
+		{
+			//标题
+			Text* text = new Text("SETTINGS", 40, Qt::green);
+			text->x = Def::trackWidth / 2, text->y = Def::trackHeight * 0.8;
+			text->anchor = Anchor::Center;
+
+			//取消按钮
+			Button* cancelBtn = new Button("CANCEL", Qt::Key::Key_Escape);
+			cancelBtn->x = Def::trackWidth * 0.25, cancelBtn->y = 30;
+			cancelBtn->w = 140, cancelBtn->h = 30;
+			cancelBtn->anchor = Anchor::Center;
+			QObject::connect(cancelBtn, &Button::ClickSignal, &Action::CancelSettings);
+
+			//保存按钮
+			Button* saveBtn = new Button("SAVE", Qt::Key::Key_Return);
+			saveBtn->x = Def::trackWidth * 0.75, saveBtn->y = 30;
+			saveBtn->w = 140, saveBtn->h = 30;
+			saveBtn->anchor = Anchor::Center;
+			QObject::connect(saveBtn, &Button::ClickSignal, &Action::SaveSettings);
+
+			settingsLayout.AddWidget(text);
+			settingsLayout.AddWidget(cancelBtn);
+			settingsLayout.AddWidget(saveBtn);
+		}
+
 		//-----------------------------------------------------------------------------//
 
 		//添加到ui管理器的绘图列表
@@ -446,6 +503,7 @@ namespace Ui
 		UiManager::GetInstance()->AddDrawList(&selectLevelLayout);
 		UiManager::GetInstance()->AddDrawList(&aboutsLayout);
 		UiManager::GetInstance()->AddDrawList(&standingLayout);
+		UiManager::GetInstance()->AddDrawList(&settingsLayout);
 
 		UiManager::GetInstance()->Enter(&mainMenuLayout);
 	}

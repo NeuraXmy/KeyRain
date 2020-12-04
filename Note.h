@@ -34,7 +34,7 @@ enum BonusMode
 * Note
 * 游戏中的一个字符类型
 */
-struct Note
+struct Note final
 {
 	char ch;
 

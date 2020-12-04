@@ -15,7 +15,7 @@ class UiManager;
 * Layout
 * 代表一个界面的类型
 */
-class Layout
+class Layout final
 {
 public:
 

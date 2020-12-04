@@ -15,7 +15,7 @@ class GameManager;
 * UiManager (QWidget)
 * 管理ui的单例类型
 */
-class UiManager : public QWidget
+class UiManager final : public QWidget
 {
 	Q_OBJECT
 

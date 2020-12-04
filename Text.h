@@ -14,7 +14,7 @@
 * Text (Widget)
 * 代表ui中的文本控件类型
 */
-class Text : public  Widget
+class Text final : public  Widget
 {
 public:
 	

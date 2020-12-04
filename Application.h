@@ -9,7 +9,7 @@
 * 应用程序的主体的单例类型
 * 掌管各种管理器类型
 */
-class Application : public QWidget
+class Application final : public QWidget
 {
 	Q_OBJECT
 
