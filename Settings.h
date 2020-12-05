@@ -17,11 +17,13 @@ public:
 	static void ReleaseInstance();
 
 	//背景音乐音量
-	int bgmVol;
+	double bgmVol;
 	//游戏音效音量
-	int seVol;
+	double seVol;
 	//是否显示粒子
 	bool showParticle;
+	//是否记录
+	bool record;
 	//note缩放
 	double noteScale;
 

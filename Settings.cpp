@@ -34,9 +34,10 @@ void Settings::ReleaseInstance()
 
 
 Settings::Settings()
-	: bgmVol(100)
-	, seVol(100)
+	: bgmVol(1.0)
+	, seVol(1.0)
 	, showParticle(true)
+	, record(true)
 	, noteScale(1.0)
 {
 
@@ -63,6 +64,7 @@ void Settings::Save() const
 	out << bgmVol << std::endl;
 	out << seVol << std::endl;
 	out << showParticle << std::endl;
+	out << record << std::endl;
 	out << noteScale << std::endl;
 
 	out.close();
@@ -84,6 +86,7 @@ void Settings::Load()
 	in >> bgmVol;
 	in >> seVol;
 	in >> showParticle;
+	in >> record;
 	in >> noteScale;
 
 	in.close();

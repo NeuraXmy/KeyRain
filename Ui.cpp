@@ -14,6 +14,8 @@
 #include "Text.h"
 #include "RecordList.h"
 #include "Image.h"
+#include "Switcher.h"
+#include "SlideBar.h"
 
 #include <qobject.h>
 #include <fstream>
@@ -487,9 +489,64 @@ namespace Ui
 			saveBtn->anchor = Anchor::Center;
 			QObject::connect(saveBtn, &Button::ClickSignal, &Action::SaveSettings);
 
+			//设置:bgm音量
+			Text* bgmText = new Text("BGM VOLUME", 23);
+			bgmText->x = 50, bgmText->y = 300;
+			bgmText->anchor = Anchor::LeftBottom;
+			SlideBar* bgmBar = new SlideBar(&Settings::GetInstance()->bgmVol, 0.0, 1.0);
+			bgmBar->x = Def::trackWidth * 0.6, bgmBar->y = 300 - 5;
+			bgmBar->w = 150, bgmBar->h = 25;
+			bgmBar->anchor = Anchor::LeftBottom;
+
+			//设置:se音量
+			Text* seText = new Text("SE VOLUME", 23);
+			seText->x = 50, seText->y = 270;
+			seText->anchor = Anchor::LeftBottom;
+			SlideBar* seBar = new SlideBar(&Settings::GetInstance()->seVol, 0.0, 1.0);
+			seBar->x = Def::trackWidth * 0.6, seBar->y = 270 - 5;
+			seBar->w = 150, seBar->h = 25;
+			seBar->anchor = Anchor::LeftBottom;
+
+			//设置：粒子效果
+			Text* particleText = new Text("PARTICLE EFFECTS", 23);
+			particleText->x = 50, particleText->y = 230;
+			particleText->anchor = Anchor::LeftBottom;
+			Switcher* particleSwc = new Switcher(&Settings::GetInstance()->showParticle);
+			particleSwc->x = Def::trackWidth * 0.6, particleSwc->y = 230 - 5;
+			particleSwc->w = 150, particleSwc->h = 25;
+			particleSwc->anchor = Anchor::LeftBottom;
+
+			//设置：记录
+			Text* recordText = new Text("GAME RECORDING", 23);
+			recordText->x = 50, recordText->y = 200;
+			recordText->anchor = Anchor::LeftBottom;
+			Switcher* recordSwc = new Switcher(&Settings::GetInstance()->record);
+			recordSwc->x = Def::trackWidth * 0.6, recordSwc->y = 200 - 5;
+			recordSwc->w = 150, recordSwc->h = 25;
+			recordSwc->anchor = Anchor::LeftBottom;
+
+			//设置:note缩放
+			Text* noteScaleText = new Text("NOTE SCALE", 23);
+			noteScaleText->x = 50, noteScaleText->y = 170;
+			noteScaleText->anchor = Anchor::LeftBottom;
+			SlideBar* noteScaleBar = new SlideBar(&Settings::GetInstance()->noteScale, 0.5, 1.5);
+			noteScaleBar->x = Def::trackWidth * 0.6, noteScaleBar->y = 170 - 5;
+			noteScaleBar->w = 150, noteScaleBar->h = 25;
+			noteScaleBar->anchor = Anchor::LeftBottom;
+
 			settingsLayout.AddWidget(text);
 			settingsLayout.AddWidget(cancelBtn);
 			settingsLayout.AddWidget(saveBtn);
+			settingsLayout.AddWidget(particleSwc);
+			settingsLayout.AddWidget(particleText);
+			settingsLayout.AddWidget(recordSwc);
+			settingsLayout.AddWidget(recordText);
+			settingsLayout.AddWidget(noteScaleText);
+			settingsLayout.AddWidget(noteScaleBar);
+			settingsLayout.AddWidget(bgmText);
+			settingsLayout.AddWidget(bgmBar);
+			settingsLayout.AddWidget(seText);
+			settingsLayout.AddWidget(seBar);
 		}
 
 		//-----------------------------------------------------------------------------//

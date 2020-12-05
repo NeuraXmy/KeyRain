@@ -3,6 +3,7 @@
 #include "Standing.h"
 #include "Define.h"
 #include "GameManager.h"
+#include "Settings.h"
 
 #include <fstream>
 #include <iomanip>
@@ -50,7 +51,10 @@ Standing::~Standing()
 
 void Standing::AddRecord(GameRecord record)
 {
-	records.push(record);
+	if (Settings::GetInstance()->record)
+	{
+		records.push(record);
+	}
 }
 
 void Standing::Save()
