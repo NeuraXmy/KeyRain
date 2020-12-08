@@ -66,6 +66,9 @@ namespace Def
 	extern const QColor recordListColor;
 	extern const QColor recordListHighlightColor;
 
+	extern const int bgCharNum;
+	extern const double bgCharSpeed;
+
 	//---------------------游戏内容相关--------------------//
 
 	extern const int gameStandbyTime;
@@ -83,7 +86,6 @@ namespace Def
 	extern const double maxFever;
 	extern const double feverIncreaseSpeed;
 	extern const int feverStandByTime;
-	extern const int feverTime;
 	extern const double feverProcessSpeedUp;
 
 	extern const double diffIncreaseSpeed;

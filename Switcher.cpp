@@ -2,6 +2,7 @@
 
 #include "Switcher.h"
 #include "Define.h"
+#include "SoundManager.h"
 
 #include <qpainter.h>
 
@@ -101,5 +102,6 @@ void Switcher::OnMouseLeftBtnReleaseEvent()
 	if (isDown)
 	{
 		isDown = false;
+		SoundManager::GetInstance()->PlaySe(Se::buttonClick);
 	}
 }

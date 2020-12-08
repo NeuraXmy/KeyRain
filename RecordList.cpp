@@ -51,6 +51,7 @@ void RecordList::Draw(QPainter* painter) const
 		return;
 	}
 
+	//每项记录的高度
 	int ItemH = h / maxShowRecordNum;
 
 	auto font = painter->font();

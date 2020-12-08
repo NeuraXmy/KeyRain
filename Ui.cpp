@@ -9,6 +9,7 @@
 #include "Define.h"
 #include "Standing.h"
 #include "Settings.h"
+#include "Background.h"
 
 #include "Button.h"
 #include "Text.h"
@@ -61,6 +62,8 @@ namespace Ui
 				GameManager::GetInstance()->OnPause();
 				//跳转到暂停界面
 				UiManager::GetInstance()->Enter(&pauseLayout);
+				//显示背景
+				Background::GetInstance()->Show();
 			}
 		}
 
@@ -72,6 +75,8 @@ namespace Ui
 				GameManager::GetInstance()->OnResume();
 				//回退到游戏界面
 				UiManager::GetInstance()->Back();
+				//隐藏背景
+				Background::GetInstance()->Hide();
 			}
 		}
 
@@ -86,6 +91,8 @@ namespace Ui
 			UiManager::GetInstance()->Back();
 			//退回主界面
 			UiManager::GetInstance()->Back();
+			//显示背景
+			Background::GetInstance()->Show();
 		}
 
 		//游戏结束
@@ -98,8 +105,14 @@ namespace Ui
 			//设置结束界面数据
 			ggLevelNameText->SetStr(record.levelName);
 			ggScoreText->SetStr(std::to_string(record.score));
+			//添加记录
+			Standing::GetInstance()->AddRecord(record);
+			//保存记录
+			Standing::GetInstance()->Save();
 			//跳到结束界面
 			UiManager::GetInstance()->Enter(&gameOverLayout);
+			//显示背景
+			Background::GetInstance()->Show();
 		}
 
 		//跳转到选关界面
@@ -168,6 +181,8 @@ namespace Ui
 			{
 				if (GameManager::GetInstance()->OnStart(levelPaths[levelList->GetCurrentIndex()]))
 				{
+					//隐藏背景
+					Background::GetInstance()->Hide();
 					UiManager::GetInstance()->Enter(&gameLayout);
 				}
 			}
@@ -248,12 +263,18 @@ namespace Ui
 			title->w = Def::trackWidth * 0.7, title->h = 100;
 			title->anchor = Anchor::Center;
 
+			//版本号
+			Text* version = new Text("V 0.1.0", 20);
+			version->x = 10.0, version->y = 10.0;
+			version->anchor = Anchor::LeftBottom;
+
 			mainMenuLayout.AddWidget(startBtn);
 			mainMenuLayout.AddWidget(exitBtn);
 			mainMenuLayout.AddWidget(settingsBtn);
 			mainMenuLayout.AddWidget(recordBtn);
 			mainMenuLayout.AddWidget(aboutBtn);
 			mainMenuLayout.AddWidget(title);
+			mainMenuLayout.AddWidget(version);
 		}
 
 		//-----------------------------------选关界面-----------------------------------//
@@ -508,7 +529,7 @@ namespace Ui
 			seBar->anchor = Anchor::LeftBottom;
 
 			//设置：粒子效果
-			Text* particleText = new Text("PARTICLE EFFECTS", 23);
+			Text* particleText = new Text("HIGH QUALITY", 23);
 			particleText->x = 50, particleText->y = 230;
 			particleText->anchor = Anchor::LeftBottom;
 			Switcher* particleSwc = new Switcher(&Settings::GetInstance()->showParticle);

@@ -69,6 +69,7 @@ void DrawManager::timerEvent(QTimerEvent* event)
 
 void DrawManager::paintEvent(QPaintEvent* event)
 {
+	//全局绘图器
 	QPainter painter(this);
 
 	//将qt的右上坐标系转换为左下坐标系
@@ -90,7 +91,7 @@ void DrawManager::paintEvent(QPaintEvent* event)
 
 void DrawManager::closeEvent(QCloseEvent* event)
 {
-	Standing::GetInstance()->Save();
+	//通过右上角关闭窗口
 	emit WindowCloseSignal();
 }
 

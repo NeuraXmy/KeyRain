@@ -28,6 +28,7 @@ void Note::Draw(QPainter* painter, bool is1st, bool fever) const
 		return;
 	}
 
+	//计算字符大小，居中显示
 	QString text(1, toupper(ch));
 	QFontMetrics m(painter->font());
 	int fontSizeX = m.width(text);
@@ -36,6 +37,7 @@ void Note::Draw(QPainter* painter, bool is1st, bool fever) const
 	painter->translate(x, y);
 
 	int r, g, b;
+	//首个字符颜色变亮
 	double fstFactor;
 
 	if (!fever)
@@ -43,12 +45,14 @@ void Note::Draw(QPainter* painter, bool is1st, bool fever) const
 		fstFactor = is1st ? 1.5 : 1.0;
 		if (bonus)
 		{
+			//奖励note蓝色
 			r = std::min(255.0, 100 * fstFactor);
 			g = std::min(255.0, 100 * fstFactor);
 			b = std::min(255.0, 255 * fstFactor);
 		}
 		else
 		{
+			//随高度由绿变红
 			double yFactor = y / double(Def::trackHeight);
 			r = std::min(255.0, ((1.0 - yFactor) * 200 + 55) * fstFactor);
 			g = std::min(255.0, (yFactor * 200 + 55) * fstFactor);
@@ -57,6 +61,7 @@ void Note::Draw(QPainter* painter, bool is1st, bool fever) const
 	}
 	else
 	{
+		//fever note黄色
 		fstFactor = is1st ? 1.5 : 0.8;
 		r = std::min(255.0, QColor(Qt::yellow).red()	* fstFactor);
 		g = std::min(255.0, QColor(Qt::yellow).green()	* fstFactor);

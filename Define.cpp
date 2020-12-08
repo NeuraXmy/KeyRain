@@ -88,6 +88,9 @@ namespace Def
 	const QColor recordListColor = Qt::green;
 	const QColor recordListHighlightColor = Qt::yellow;
 
+	const int bgCharNum = 10;
+	const double bgCharSpeed = 25;
+
 	//---------------------游戏内容相关--------------------//
 
 	const int gameStandbyTime = 3000;
@@ -105,7 +108,6 @@ namespace Def
 	const double maxFever = 1000;
 	const double feverIncreaseSpeed = 35;
 	const int feverStandByTime = 3000;
-	const int feverTime = 8000;
 	const double feverProcessSpeedUp = 5;
 
 	const double diffIncreaseSpeed = 0.0012;

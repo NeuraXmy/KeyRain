@@ -53,6 +53,7 @@ void Layout::Update(int time)
 {
 	if (visible && y > 0)
 	{
+		//从上方落下进入
 		y += (-y - 10) * 0.2;
 		if (y < 1.0)
 		{
@@ -61,6 +62,7 @@ void Layout::Update(int time)
 	}
 	if (!visible && y > -Def::trackHeight)
 	{
+		//落到下方退出
 		y += (-Def::trackHeight - y - 10) * 0.2;
 		if (y - -Def::trackHeight < 1.0)
 		{

@@ -6,6 +6,7 @@
 #include "Particle.h"
 #include "ParticleManager.h"
 #include "Settings.h"
+#include "SoundManager.h"
 
 #include <qpainter.h>
 #include <qevent.h>
@@ -17,8 +18,6 @@
 #include <algorithm>
 #include <random>
 #include <qdatetime.h>
-
-
 
 namespace
 {
@@ -157,7 +156,7 @@ void GameManager::ResetAll()
 	randomOrder = false;
 
 	fever = 0.0;
-	feverStartTime = -Def::feverTime * 2;
+	feverStartTime = 0.0;
 	feverMode = FeverMode::notFever;
 
 	for (int ch = 'a'; ch <= 'z'; ch++)
@@ -514,6 +513,8 @@ void GameManager::Update()
 							ParticleManager::GetInstacne()->Cast(time, p);
 						}
 
+						SoundManager::GetInstance()->PlaySe(Se::noteHit);
+
 						break;
 					}
 					//按错按键
@@ -556,6 +557,8 @@ void GameManager::Update()
 								p.pos = std::make_pair(note->x + p.v.first / 200.0 * Def::keySize * 0.5, note->y + p.v.second / 200.0 * Def::keySize * 0.5);
 								ParticleManager::GetInstacne()->Cast(time, p);
 							}
+
+							SoundManager::GetInstance()->PlaySe(Se::noteLost);
 						}
 						break;
 					}
@@ -664,6 +667,8 @@ void GameManager::Update()
 						p.pos = std::make_pair(note->x + p.v.first / 200.0 * Def::keySize * 0.5, note->y + p.v.second / 200.0 * Def::keySize * 0.5);
 						ParticleManager::GetInstacne()->Cast(time, p);
 					}
+
+					SoundManager::GetInstance()->PlaySe(Se::noteLost);
 				}
 
 				//判断是否存在剩余的note 并设置第一个note的键盘颜色提示
@@ -721,6 +726,7 @@ void GameManager::Update()
 			{
 				feverMode = FeverMode::fever;
 				trackShake = Def::maxTrackShake * 2.0;
+				SoundManager::GetInstance()->PlaySe(Se::explode);
 			}
 			//fever结束
 			else if (fever < 0.5 && feverMode == FeverMode::fever)
@@ -732,11 +738,11 @@ void GameManager::Update()
 			//fever和非fever模式下的fever条下降速度
 			if (feverMode == FeverMode::notFever)
 			{
-				fever -= 1.0 / noteInterval * Def::feverIncreaseSpeed * 0.5 / 1000. * Def::tickTime;
+				fever -= 1.0 / noteInterval * Def::feverIncreaseSpeed * 0.5 / 1000.0 * Def::tickTime;
 			}
 			else if (feverMode == FeverMode::fever)
 			{
-				fever -= Def::maxFever / Def::feverTime * Def::tickTime;
+				fever -= 1.0 / noteInterval * Def::feverIncreaseSpeed * 0.75 / 1000.0 * Def::tickTime;
 			}
 
 			//fever模式下的粒子效果
@@ -969,7 +975,13 @@ void GameManager::DrawGui(QPainter* painter) const
 		{
 			double feverFactor = double(fever) / Def::maxFever;
 
-			QPen pen(feverBarColor);
+			QColor color = feverBarColor;
+			if (feverMode == FeverMode::fever && (time / 100) & 1)
+			{
+				color = Lerp(color, Qt::white, 0.6);
+			}
+
+			QPen pen(color);
 			pen.setWidth(3);
 			painter->setPen(pen);
 			painter->drawText(scoreWidth + 10, 0, "[FEVER] ");
@@ -977,7 +989,7 @@ void GameManager::DrawGui(QPainter* painter) const
 			{
 				painter->setBrush(Qt::black);
 				painter->drawRect(scoreWidth + 120 + i * 25, 0, 20, -20);
-				painter->setBrush(feverBarColor);
+				painter->setBrush(color);
 				painter->drawRect(scoreWidth + 120 + i * 25, 0, 20, -20 * std::min(1.0, feverFactor * 5.0));
 				feverFactor = std::max(0.0, feverFactor -= 0.2);
 			}
@@ -1030,3 +1042,5 @@ void GameManager::DrawGui(QPainter* painter) const
 		}
 	}
 }
+
+//owo

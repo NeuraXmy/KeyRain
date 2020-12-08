@@ -59,6 +59,7 @@ void InputManager::timerEvent(QTimerEvent* event)
 
 void InputManager::mouseMoveEvent(QMouseEvent* event)
 {
+	//转换为窗口坐标系
 	QPoint pos = DrawManager::GetInstance()->mapFromGlobal(event->globalPos());
 	emit MouseMoveSignal(pos.x(), pos.y());
 }

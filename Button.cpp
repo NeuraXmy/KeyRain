@@ -2,6 +2,7 @@
 
 #include "Button.h"
 #include "Define.h"
+#include "SoundManager.h"
 
 #include <qpainter.h>
 
@@ -112,6 +113,7 @@ void Button::OnMouseLeftBtnReleaseEvent()
 		//不在按钮上则不判断按下
 		if (isHover)
 		{
+			SoundManager::GetInstance()->PlaySe(Se::buttonClick);
 			emit ClickSignal();
 		}
 	}
@@ -135,10 +137,14 @@ void Button::OnKeyPressEvent(int key)
 		return;
 	}
 
+	SoundManager::GetInstance()->PlaySe(Se::buttonClick);
+
 	if (key == hotkey && !isDown && !hotkeyPressed)
 	{
 		hotkeyPressed = true;
 		isDown = true;
+
+		SoundManager::GetInstance()->PlaySe(Se::buttonClick);
 
 		//快捷键按下时即马上判断按钮按下
 		emit ClickSignal();

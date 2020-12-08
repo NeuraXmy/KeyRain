@@ -2,6 +2,7 @@
 
 #include "SlideBar.h"
 #include "Define.h"
+#include "SoundManager.h"
 
 #include <qpainter.h>
 
@@ -90,6 +91,7 @@ void SlideBar::OnMouseLeftBtnReleaseEvent()
 	if (isDown)
 	{
 		isDown = false;
+		SoundManager::GetInstance()->PlaySe(Se::buttonClick);
 	}
 }
 

@@ -3,6 +3,7 @@
 #include "UiManager.h"
 #include "Define.h"
 #include "Layout.h"
+#include "Background.h"
 
 #include <qevent.h>
 #include <qtimer.h>
@@ -46,7 +47,7 @@ UiManager::UiManager()
 
 UiManager::~UiManager()
 {
-
+	Background::ReleaseInstance();
 }
 
 
@@ -77,6 +78,8 @@ void UiManager::Draw(QPainter* painter) const
 {
 	painter->translate(Def::trackPosX, Def::trackPosY);
 
+	Background::GetInstance()->Draw(painter);
+
 	for (auto layout : drawList)
 	{
 		layout->Draw(painter);
@@ -104,6 +107,7 @@ void UiManager::OnKeyReleaseEvent(int key)
 
 void UiManager::OnMouseMoveEvent(int mouseX, int mouseY)
 {
+	//转化为轨道坐标系
 	layouts.back()->OnMouseMoveEvent(mouseX - Def::trackPosX, 
 		(Def::windowHeight - mouseY) - Def::trackPosY);
 }
@@ -132,6 +136,7 @@ void UiManager::timerEvent(QTimerEvent* event)
 	for (auto layout : drawList)
 	{
 		layout->Update(time);
+		Background::GetInstance()->Update(time);
 	}
 }
 

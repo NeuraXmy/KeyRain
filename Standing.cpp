@@ -62,17 +62,19 @@ void Standing::Save()
 	std::string path = Def::profilePath + "records.dat";
 	std::ofstream out(path);
 
+	auto recs = records;
+
 	if (!out)
 	{
 		qDebug() << "[ERR] Failed to save records";
 		return;
 	}
 
-	out << records.size() << std::endl;
-	while(records.size())
+	out << recs.size() << std::endl;
+	while(recs.size())
 	{
-		GameRecord rec = records.top();
-		records.pop();
+		GameRecord rec = recs.top();
+		recs.pop();
 
 		out << rec.score << std::endl;
 		out << rec.levelName << std::endl;

@@ -8,6 +8,7 @@
 #include "UiManager.h"
 #include "ParticleManager.h"
 #include "DrawManager.h"
+#include "SoundManager.h"
 
 #include "Standing.h"
 #include "Settings.h"
@@ -74,8 +75,10 @@ Application::~Application()
 	ParticleManager::ReleaseInstance();
 	DrawManager::ReleaseInstance();
 	UiManager::ReleaseInstance();
+	SoundManager::ReleaseInstance();
 
 	Standing::ReleaseInstance();
+	Settings::ReleaseInstance();
 }
 
 
@@ -97,15 +100,15 @@ void Application::InitSingalSlots()
 		UiManager::GetInstance(), &UiManager::OnMouseLeftBtnPressEvent);
 	connect(InputManager::GetInstance(), &InputManager::MouseLeftBtnReleaseSignal,
 		UiManager::GetInstance(), &UiManager::OnMouseLeftBtnReleaseEvent);
-
-	connect(GameManager::GetInstance(), &GameManager::GameOverSignal,
-		Standing::GetInstance(), &Standing::AddRecord);
 }
 
 void Application::Start()
 {
 	//实例化绘图管理器
 	DrawManager::GetInstance();
+
+	//实例化音效管理器
+	SoundManager::GetInstance();
 
 	//初始化ui
 	Ui::Init();
@@ -119,7 +122,5 @@ void Application::Start()
 
 void Application::Exit()
 {
-	Standing::GetInstance()->Save();
-
 	ReleaseInstance();
 }
