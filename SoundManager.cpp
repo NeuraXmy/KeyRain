@@ -69,6 +69,7 @@ SoundManager::SoundManager()
 	soundList.push_back(Se::noteHit  = new SoundEffect(thread, "note_hit"));
 	soundList.push_back(Se::noteLost = new SoundEffect(thread, "note_lost"));
 	soundList.push_back(Se::buttonClick = new SoundEffect(thread, "button_click"));
+	soundList.push_back(Se::explode = new SoundEffect(thread, "explosion"));
 
 	thread->start();
 }

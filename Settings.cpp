@@ -35,7 +35,7 @@ void Settings::ReleaseInstance()
 
 Settings::Settings()
 	: bgmVol(1.0)
-	, seVol(1.0)
+	, seVol(0.5)
 	, showParticle(true)
 	, record(true)
 	, noteScale(1.0)

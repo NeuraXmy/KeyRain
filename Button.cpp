@@ -95,6 +95,7 @@ void Button::OnMouseLeftBtnPressEvent()
 
 	if (!isDown)
 	{
+		SoundManager::GetInstance()->PlaySe(Se::buttonClick);
 		isDown = true;
 	}
 }
@@ -113,7 +114,6 @@ void Button::OnMouseLeftBtnReleaseEvent()
 		//不在按钮上则不判断按下
 		if (isHover)
 		{
-			SoundManager::GetInstance()->PlaySe(Se::buttonClick);
 			emit ClickSignal();
 		}
 	}

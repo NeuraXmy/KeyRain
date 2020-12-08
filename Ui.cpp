@@ -264,7 +264,7 @@ namespace Ui
 			title->anchor = Anchor::Center;
 
 			//°æ±¾ºÅ
-			Text* version = new Text("V 0.1.0", 20);
+			Text* version = new Text("V 0.0.3", 20);
 			version->x = 10.0, version->y = 10.0;
 			version->anchor = Anchor::LeftBottom;
 
