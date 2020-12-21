@@ -1,3 +1,5 @@
+//Image.cpp: 图片控件类型
+
 #include "Image.h"
 
 #include <qpainter.h>
