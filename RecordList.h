@@ -1,4 +1,4 @@
-//RecordList.h: ¼ÇÂ¼ÁĞ±íÀàĞÍ
+//RecordList.h: è®°å½•åˆ—è¡¨ç±»å‹
 
 #pragma once
 
@@ -14,9 +14,9 @@ class Button;
 
 
 /**
-* Text (Widget)
-* ´ú±íuiÖĞµÄ¼ÇÂ¼ÁĞ±í¿Ø¼şÀàĞÍ
-* ¿ÉÒÔÓÃÒÔ¼ÇÂ¼Õ¹Ê¾»òÑ¡Ôñ
+* RecordList (Widget)
+* ä»£è¡¨uiä¸­çš„è®°å½•åˆ—è¡¨æ§ä»¶ç±»å‹
+* å¯ä»¥ç”¨ä»¥è®°å½•å±•ç¤ºæˆ–é€‰æ‹©
 */
 class RecordList final : public  Widget
 {
@@ -34,53 +34,53 @@ public:
 
 
 
-	//ÏòÏÂÒ»Ìõ¼ÇÂ¼
+	//å‘ä¸‹ä¸€æ¡è®°å½•
 	void OnDown();
 
-	//ÏòÉÏÒ»Ìõ¼ÇÂ¼
+	//å‘ä¸Šä¸€æ¡è®°å½•
 	void OnUp();
 
 
 
-	//»ñÈ¡µ±Ç°¼ÇÂ¼
+	//è·å–å½“å‰è®°å½•
 	std::string GetCurrentRecord() const;
 
-	//»ñÈ¡µ±Ç°¼ÇÂ¼ÊÇµÚ¼¸Ìõ
+	//è·å–å½“å‰è®°å½•æ˜¯ç¬¬å‡ æ¡
 	int GetCurrentIndex() const;
 
-	//»ñÈ¡µ±Ç°×Ü¼ÇÂ¼ÌõÊı
+	//è·å–å½“å‰æ€»è®°å½•æ¡æ•°
 	int GetRecordNum() const;
 
-	//»ñÈ¡Ä³¸öË÷ÒıÏÂµÄ¼ÇÂ¼
+	//è·å–æŸä¸ªç´¢å¼•ä¸‹çš„è®°å½•
 	std::string GetRecord(int index) const;
 
-	//Çå¿Õ¼ÇÂ¼
+	//æ¸…ç©ºè®°å½•
 	void Clear();
 
-	//¼ÓÈë¼ÇÂ¼
+	//åŠ å…¥è®°å½•
 	void AddRecord(const std::string& record);
 
-	//É¾³ı¼ÇÂ¼£¨Èç¹û´æÔÚ£©
+	//åˆ é™¤è®°å½•ï¼ˆå¦‚æœå­˜åœ¨ï¼‰
 	void DeleteRecord(const std::string& record);
 
-	//É¾³ıÄ³¸öË÷ÒıÏÂµÄ¼ÇÂ¼
+	//åˆ é™¤æŸä¸ªç´¢å¼•ä¸‹çš„è®°å½•
 	void DeleteRecord(int index);
 
-	//°ó¶¨ÏòÉÏµÄ°´Å¥
+	//ç»‘å®šå‘ä¸Šçš„æŒ‰é’®
 	void BindUpButton(Button* upBtn);
 
-	//°ó¶¨ÏòÏÂµÄ°´Å¥
+	//ç»‘å®šå‘ä¸‹çš„æŒ‰é’®
 	void BindDownButton(Button* downBtn);
 
 private:
 
-	//µ±Ç°µÄ¼ÇÂ¼Ë÷Òı
+	//å½“å‰çš„è®°å½•ç´¢å¼•
 	int current;
 
-	//ÏÔÊ¾ÖĞµÄÆ«ÒÆ
+	//æ˜¾ç¤ºä¸­çš„åç§»
 	double showingOffset;
 
-	//×î¶àÏÔÊ¾µÄ¼ÇÂ¼Êı
+	//æœ€å¤šæ˜¾ç¤ºçš„è®°å½•æ•°
 	int maxShowRecordNum;
 
 	std::vector<std::string> records;
@@ -89,7 +89,7 @@ private:
 
 	Button* downBtn;
 
-	//»ñÈ¡ÏÔÊ¾ÖĞµÄ¿ªÊ¼Ë÷ÒıºÍ½áÊøË÷Òı
+	//è·å–æ˜¾ç¤ºä¸­çš„å¼€å§‹ç´¢å¼•å’Œç»“æŸç´¢å¼•
 	std::pair<int, int> GetStartEndIndex() const;
 
 };
