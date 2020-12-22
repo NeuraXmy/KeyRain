@@ -179,7 +179,21 @@ namespace Ui
 		{	
 			if (levelPaths.size())
 			{
-				if (GameManager::GetInstance()->OnStart(levelPaths[levelList->GetCurrentIndex()]))
+				if (GameManager::GetInstance()->OnStart(levelPaths[levelList->GetCurrentIndex()], false))
+				{
+					//隐藏背景
+					Background::GetInstance()->Hide();
+					UiManager::GetInstance()->Enter(&gameLayout);
+				}
+			}
+		}
+
+		//快速模式游戏开启
+		void StartGameFastMode()
+		{
+			if (levelPaths.size())
+			{
+				if (GameManager::GetInstance()->OnStart(levelPaths[levelList->GetCurrentIndex()], true))
 				{
 					//隐藏背景
 					Background::GetInstance()->Hide();
@@ -264,7 +278,7 @@ namespace Ui
 			title->anchor = Anchor::Center;
 
 			//版本号
-			Text* version = new Text("V 0.0.3", 20);
+			Text* version = new Text("V 0.0.4", 20);
 			version->x = 10.0, version->y = 10.0;
 			version->anchor = Anchor::LeftBottom;
 
@@ -319,12 +333,20 @@ namespace Ui
 			startBtn->anchor = Anchor::Center;
 			QObject::connect(startBtn, &Button::ClickSignal, &Action::StartGame);
 
+			//开始快速游戏按钮
+			Button* fastStartBtn = new Button("FAST GAME");
+			fastStartBtn->x = 110, fastStartBtn->y = Def::trackHeight / 2 - 100;
+			fastStartBtn->w = 140, fastStartBtn->h = 27;
+			fastStartBtn->anchor = Anchor::Center;
+			QObject::connect(fastStartBtn, &Button::ClickSignal, &Action::StartGameFastMode);
+
 			selectLevelLayout.AddWidget(text);
 			selectLevelLayout.AddWidget(levelList);
 			selectLevelLayout.AddWidget(downBtn);
 			selectLevelLayout.AddWidget(backBtn);
 			selectLevelLayout.AddWidget(upBtn);
 			selectLevelLayout.AddWidget(startBtn);
+			selectLevelLayout.AddWidget(fastStartBtn);
 		}
 
 		//-----------------------------------暂停界面-----------------------------------//

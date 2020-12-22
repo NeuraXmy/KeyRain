@@ -33,7 +33,7 @@ void InputManager::ReleaseInstance()
 InputManager::InputManager()
 	: QWidget()
 {
-	timerId = QWidget::startTimer(Def::inputTickTime, Qt::PreciseTimer);
+	timerId = QWidget::startTimer(Def::inputTick, Qt::PreciseTimer);
 
 	this->setMouseTracking(true);
 

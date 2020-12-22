@@ -9,7 +9,7 @@ class QPainter;
 
 
 //控件的锚定位置
-enum Anchor
+enum class Anchor
 {
 	Center,
 	LeftBottom
@@ -34,7 +34,7 @@ public:
 	int h;
 
 	//锚定位置(默认为左下)
-	int anchor;
+	Anchor anchor;
 
 	bool visible;
 

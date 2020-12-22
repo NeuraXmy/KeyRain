@@ -114,7 +114,7 @@ GameManager::~GameManager()
 
 
 
-int GameManager::GetStat() const
+GameStat GameManager::GetStat() const
 {
 	return stat;
 }
@@ -171,6 +171,8 @@ void GameManager::ResetAll()
 	scoreBarColor = Qt::black;
 
 	trackShake = 0.0;
+
+	fastMode = false;
 }
 
 void GameManager::InitNotes()
@@ -234,7 +236,7 @@ bool GameManager::LoadLevel(const std::string& name)
 
 
 
-bool GameManager::OnStart(const std::string& name)
+bool GameManager::OnStart(const std::string& name, bool fastMode)
 {
 	ResetAll();
 
@@ -247,6 +249,8 @@ bool GameManager::OnStart(const std::string& name)
 	InitNotes();
 
 	stat = GameStat::gameStandby;
+	this->fastMode = fastMode;
+
 	qDebug() << "[INFO] Game started";
 
 	return true;
@@ -300,9 +304,9 @@ void GameManager::timerEvent(QTimerEvent* event)
 
 	static int updateTime = 0;
 	
-	while (updateTime >= Def::tickTime) 
+	while (updateTime >= Def::gameTick) 
 	{
-		updateTime -= Def::tickTime;
+		updateTime -= Def::gameTick;
 		Update();
 	}
 
@@ -316,7 +320,7 @@ void GameManager::Update()
 {
 	if (stat == GameStat::gameStandby)
 	{
-		time += Def::tickTime;
+		time += Def::gameTick;
 		if (time >= Def::gameStandbyTime)
 		{
 			stat = GameStat::running;
@@ -326,7 +330,7 @@ void GameManager::Update()
 	{
 		//-----------------------------------游戏运行--------------------------------------//
 
-		time += Def::tickTime;
+		time += Def::gameTick;
 
 		//-----------------------------------更新游戏进程----------------------------------//
 
@@ -335,7 +339,7 @@ void GameManager::Update()
 				sqrt(
 					noteCount
 					* (feverMode == FeverMode::fever ? Def::feverProcessSpeedUp : 1.0)
-					* Def::diffIncreaseSpeed
+					* (fastMode ? Def::diffIncreaseSpeedFastMode : Def::diffIncreaseSpeed)
 					* (1.0 + fever / Def::maxFever * (Def::noteProcessFeverEffect - 1.0)) + 1.0)
 				- 1.0
 			)
@@ -391,7 +395,7 @@ void GameManager::Update()
 				if (bonusMode != BonusMode::noBonus)
 				{
 					//奖励模式对应的颜色
-					bottomLightColor = Lerp(bottomLightColor, Def::bonusColor[bonusMode], 0.05);
+					bottomLightColor = Lerp(bottomLightColor, Def::bonusColor[static_cast<int>(bonusMode)], 0.05);
 				}
 				else
 				{
@@ -480,7 +484,8 @@ void GameManager::Update()
 								+ combo * Def::comboBonusScore
 								* (feverMode == FeverMode::fever ? 5 : 1);
 
-							fever += Def::feverIncreaseSpeed;
+							fever += Def::feverIncreaseSpeed 
+								* (feverMode != FeverMode::fever && fastMode ? Def::fastModeFeverFactor : 1.0);
 
 							combo++;
 						}
@@ -586,7 +591,7 @@ void GameManager::Update()
 				//更新显示中的note的y坐标
 				if (note->stat != NoteStat::hidden)
 				{
-					note->y -= noteSpeed * (1.0 - noteSlowDown * (1.0 - note->y / Def::trackHeight)) / 1000.0 * Def::tickTime;
+					note->y -= noteSpeed * (1.0 - noteSlowDown * (1.0 - note->y / Def::trackHeight)) / 1000.0 * Def::gameTick;
 				}
 
 				//未下落的note满足开始下落条件 则开始下落（单词首个字母前有额外间隔）
@@ -601,7 +606,7 @@ void GameManager::Update()
 						&& combo > nextBonusCombo 
 						&& Def::RandInt(1, 5) == 1)
 					{
-						note->bonus = Def::RandInt(1, BonusMode::bonusNum - 1);
+						note->bonus = static_cast<BonusMode>(Def::RandInt(1, static_cast<int>(BonusMode::bonusNum) - 1));
 						nextBonusCombo = combo + Def::bonusCombo;
 					}
 
@@ -738,11 +743,11 @@ void GameManager::Update()
 			//fever和非fever模式下的fever条下降速度
 			if (feverMode == FeverMode::notFever)
 			{
-				fever -= 1.0 / noteInterval * Def::feverIncreaseSpeed * 0.5 / 1000.0 * Def::tickTime;
+				fever -= 1.0 / noteInterval * Def::feverIncreaseSpeed * 0.5 / 1000.0 * Def::gameTick;
 			}
 			else if (feverMode == FeverMode::fever)
 			{
-				fever -= 1.0 / noteInterval * Def::feverIncreaseSpeed * 0.75 / 1000.0 * Def::tickTime;
+				fever -= 1.0 / noteInterval * Def::feverIncreaseSpeed * 0.75 / 1000.0 * Def::gameTick;
 			}
 
 			//fever模式下的粒子效果
@@ -761,7 +766,7 @@ void GameManager::Update()
 			}
 
 			//奖励模式的结束
-			if (bonusMode != BonusMode::noBonus && time - bonusStartTime > Def::bonusTime[bonusMode])
+			if (bonusMode != BonusMode::noBonus && time - bonusStartTime > Def::bonusTime[static_cast<int>(bonusMode)])
 			{
 				bonusMode = BonusMode::noBonus;
 				nextBonusCombo = combo + Def::bonusCombo;
@@ -778,7 +783,7 @@ void GameManager::Update()
 		if (health == 0)
 		{
 			emit GameOverSignal(GameRecord{ 
-				score, 
+				static_cast<int>(score * (fastMode ? Def::fastModeScoreFactor : 1.0)),
 				levelName, 
 				QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss").toStdString() 
 				});
@@ -889,17 +894,17 @@ void GameManager::DrawTrack(QPainter* painter) const
 			font.setPixelSize(50);
 			painter->setFont(font);
 			QFontMetrics m(painter->font());
-			int fontSizeX = m.width(Def::bonusTitle[bonusMode].c_str());
+			int fontSizeX = m.width(Def::bonusTitle[static_cast<int>(bonusMode)].c_str());
 			int fontSizeY = m.height();
 
 			painter->translate(Def::trackWidth / 2, Def::trackHeight / 2);
 
-			QColor color = Lerp(Def::bonusColor[bonusMode], Qt::black, 0.5);
+			QColor color = Lerp(Def::bonusColor[static_cast<int>(bonusMode)], Qt::black, 0.5);
 			painter->setPen(color);
 
 			painter->setOpacity(std::max(0.0, ((2000.0 - (time - bonusStartTime)) / 2000.0)));
 			painter->scale(bonusMode == BonusMode::reverse ? -1.0 : 1.0, -1.0);
-			painter->drawText(-fontSizeX / 2, -fontSizeY / 2, Def::bonusTitle[bonusMode].c_str());
+			painter->drawText(-fontSizeX / 2, -fontSizeY / 2, Def::bonusTitle[static_cast<int>(bonusMode)].c_str());
 			painter->scale(bonusMode == BonusMode::reverse ? -1.0 : 1.0, -1.0);
 			painter->setOpacity(1.0);
 

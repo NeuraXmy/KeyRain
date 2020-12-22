@@ -41,7 +41,7 @@ void DrawManager::ReleaseInstance()
 DrawManager::DrawManager()
 	: QWidget()
 {
-	timerId = startTimer(Def::frameTime, Qt::PreciseTimer);
+	timerId = startTimer(Def::frameTick, Qt::PreciseTimer);
 
 	QIcon icon((Def::resPath + "icon.ico").c_str());
 

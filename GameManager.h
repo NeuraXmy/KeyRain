@@ -15,9 +15,11 @@ class QPainter;
 
 class Note;
 
+enum class BonusMode;
+
 
 //游戏的状态
-enum GameStat
+enum class GameStat
 {
 	running,
 	preparing,
@@ -27,7 +29,7 @@ enum GameStat
 };
 
 //fever的状态
-enum FeverMode
+enum class FeverMode
 {
 	notFever,
 	standby,
@@ -79,12 +81,12 @@ public:
 
 
 	//获取游戏状态
-	int GetStat() const;
+	GameStat GetStat() const;
 
 
 
-	//开始词库为name的一轮游戏 返回词库是否加载成功
-	bool OnStart(const std::string& name);
+	//开始词库为name的一轮游戏 并选择是否为快速模式 返回词库是否加载成功
+	bool OnStart(const std::string& name, bool fastMode);
 
 	//游戏暂停
 	void OnPause();
@@ -132,7 +134,9 @@ private:
 	//某个键是否按下
 	mutable std::map<int, bool> keyHolding;
 
-	int stat;
+	GameStat stat;
+
+	bool fastMode;
 
 	//------------------------------------内容相关-------------------------------------//
 
@@ -147,14 +151,14 @@ private:
 	//实际显示的分数
 	int scoreDisplaying;
 
-	int bonusMode;
+	BonusMode bonusMode;
 	int bonusStartTime = 0;
 
 	int health;
 
 	double fever;
 	int feverStartTime;
-	int feverMode;
+	FeverMode feverMode;
 
 	//已经经过的按键数量
 	int noteCount;

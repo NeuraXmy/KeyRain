@@ -43,7 +43,7 @@ void Note::Draw(QPainter* painter, bool is1st, bool fever) const
 	if (!fever)
 	{
 		fstFactor = is1st ? 1.5 : 1.0;
-		if (bonus)
+		if (bonus != BonusMode::noBonus)
 		{
 			//½±ÀønoteÀ¶É«
 			r = std::min(255.0, 100 * fstFactor);

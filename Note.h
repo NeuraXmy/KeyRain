@@ -9,7 +9,7 @@ class QPainter;
 
 
 //字符的状态
-enum NoteStat
+enum class NoteStat
 {
 	hidden,
 	visible,
@@ -18,7 +18,7 @@ enum NoteStat
 };
 
 //字符的奖励类型
-enum BonusMode
+enum class BonusMode
 {
 	noBonus,
 	fast,
@@ -36,14 +36,15 @@ enum BonusMode
 */
 struct Note final
 {
+
 	char ch;
 
 	double x;
 	double y;
 
-	int stat;
+	NoteStat stat;
 
-	int bonus;
+	BonusMode bonus;
 
 	//字符是否在单词的首位
 	bool wordBegin;

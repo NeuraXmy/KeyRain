@@ -1,4 +1,4 @@
-//RecordList.cpp: ¼ÇÂ¼ÁÐ±íÀàÐÍ
+//RecordList.cpp: è®°å½•åˆ—è¡¨ç±»åž‹
 
 #include <qpainter.h>
 
@@ -51,7 +51,7 @@ void RecordList::Draw(QPainter* painter) const
 		return;
 	}
 
-	//Ã¿Ïî¼ÇÂ¼µÄ¸ß¶È
+	//æ¯é¡¹è®°å½•çš„é«˜åº¦
 	int ItemH = h / maxShowRecordNum;
 
 	auto font = painter->font();
@@ -205,7 +205,7 @@ std::pair<int, int> RecordList::GetStartEndIndex() const
 {
 	if (maxShowRecordNum > records.size())
 	{
-		return std::make_pair(0, records.size());
+		return std::make_pair(0, int(records.size()));
 	}
 
 	int start = std::max(0, current - maxShowRecordNum / 2);

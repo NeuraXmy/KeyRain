@@ -16,17 +16,12 @@ namespace Def
 
 	//---------------------程序相关------------------------//
 
-	extern const int tickTime;
-	extern const double tickCount;
-
-	extern const int frameTime;
-
-	extern const int inputTickTime;
-
+	extern const int gameTick;
+	extern const int frameTick;
+	extern const int inputTick;
 	extern const int uiTick;
 	
 	extern const std::string resPath;
-
 	extern const std::string profilePath;
 
 	//---------------------视觉相关------------------------//
@@ -77,6 +72,7 @@ namespace Def
 	extern const int comboBonusScore;
 	extern const int noteLostScore;
 	extern const int noteMissScore;
+	extern const double fastModeScoreFactor;
 
 	extern const int maxHealth;
 	extern const int comboHealth;
@@ -87,15 +83,18 @@ namespace Def
 	extern const double feverIncreaseSpeed;
 	extern const int feverStandByTime;
 	extern const double feverProcessSpeedUp;
+	extern const double fastModeFeverFactor;
 
 	extern const double diffIncreaseSpeed;
+	extern const double diffIncreaseSpeedFastMode;
+	extern const double noteProcessFeverEffect;
+
 	extern const double noteSpeedStart;
 	extern const double noteSpeedEnd;
 	extern const double noteSlowDownStart;
 	extern const double noteSlowDownEnd;
 	extern const double noteIntervalStart;
 	extern const double noteIntervalEnd;
-	extern const double noteProcessFeverEffect;
 
 	extern const int bonusCombo;
 	extern const int bonusTime[];

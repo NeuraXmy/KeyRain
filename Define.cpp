@@ -12,18 +12,17 @@ namespace Def
 
 	//---------------------程序相关------------------------//
 
-	const int tickTime = 10;
-	const double tickCount = 1000.0 / tickTime;
+	const int gameTick	= 10;
 
-	const int frameTime = 10;
+	const int frameTick = 10;
 
-	const int inputTickTime = 10;
+	const int inputTick	= 10;
 
-	const int uiTick = 20;
+	const int uiTick	= 20;
 
-	const std::string resPath = "../resources/";
+	const std::string resPath		= "../resources/";
 
-	const std::string profilePath = "../profiles/";
+	const std::string profilePath	= "../profiles/";
 
 	//---------------------视觉相关------------------------//
 
@@ -46,13 +45,13 @@ namespace Def
 		1, 3, 1, 3, 1
 	};
 
-	const int windowWidth = 600;
-	const int windowHeight = 700;
+	const int windowWidth	= 600;
+	const int windowHeight	= 700;
 
-	const int trackWidth = 550;
-	const int trackHeight = 450;
-	const int trackPosX = 25;
-	const int trackPosY = 275;
+	const int trackWidth	= 550;
+	const int trackHeight	= 450;
+	const int trackPosX		= 25;
+	const int trackPosY		= 275;
 
 	const double maxTrackShake = 5.0;
 	const double trackShakeDecreseSpeed = 0.15;
@@ -80,13 +79,13 @@ namespace Def
 		QColor(255, 50, 200)
 	};
 
-	const QColor btnColor = Qt::green;
-	const QColor btnHoverColor = Qt::yellow;
-	const QColor btnDownColor = Qt::white;
-	const QColor btnDisabledColor = QColor(20, 100, 20);
+	const QColor btnColor			= Qt::green;
+	const QColor btnHoverColor		= Qt::yellow;
+	const QColor btnDownColor		= Qt::white;
+	const QColor btnDisabledColor	= QColor(20, 100, 20);
 
-	const QColor recordListColor = Qt::green;
-	const QColor recordListHighlightColor = Qt::yellow;
+	const QColor recordListColor			= Qt::green;
+	const QColor recordListHighlightColor	= Qt::yellow;
 
 	const int bgCharNum = 10;
 	const double bgCharSpeed = 25;
@@ -99,6 +98,7 @@ namespace Def
 	const int comboBonusScore = 1;
 	const int noteLostScore = -10;
 	const int noteMissScore = -5;
+	const double fastModeScoreFactor = 0.5;
 
 	const int maxHealth = 1000;
 	const int comboHealth = 1;
@@ -109,15 +109,18 @@ namespace Def
 	const double feverIncreaseSpeed = 35;
 	const int feverStandByTime = 3000;
 	const double feverProcessSpeedUp = 5;
+	const double fastModeFeverFactor = 1.5;
 
 	const double diffIncreaseSpeed = 0.0012;
-	const double noteSpeedStart = 300.0;
-	const double noteSpeedEnd = 1000.0;
-	const double noteSlowDownStart = 0.95;
-	const double noteSlowDownEnd = 0.999;
-	const double noteIntervalStart = 0.4;
-	const double noteIntervalEnd = 0.15;
+	const double diffIncreaseSpeedFastMode = 0.005;
 	const double noteProcessFeverEffect = 10.0;
+
+	const double noteSpeedStart		= 300.0;
+	const double noteSpeedEnd		= 1000.0;
+	const double noteSlowDownStart	= 0.95;
+	const double noteSlowDownEnd	= 0.999;
+	const double noteIntervalStart	= 0.4;
+	const double noteIntervalEnd	= 0.15;
 
 	const int bonusCombo = 20;
 	const int bonusTime[] =
@@ -145,8 +148,7 @@ namespace Def
 
 	//---------------------工具函数------------------------//
 
-	//随机数引擎
-	std::default_random_engine re;
+	static std::default_random_engine re;
 
 	int RandInt(int l, int r)
 	{

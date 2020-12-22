@@ -85,8 +85,8 @@ void ParticleManager::Update(int time)
 		//更新粒子的物理信息
 		it->v.first *= (1.0 - it->resist);
 		it->v.second *= (1.0 - it->resist);
-		it->pos.first += it->v.first / 1000.0 * Def::tickTime;
-		it->pos.second += it->v.second / 1000.0 * Def::tickTime;
+		it->pos.first += it->v.first / 1000.0 * Def::gameTick;
+		it->pos.second += it->v.second / 1000.0 * Def::gameTick;
 
 		it++;
 	}
